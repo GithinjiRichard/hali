@@ -1,0 +1,2 @@
+# This directory holds the SQLite database file (fuel.db),
+# generated automatically by `npm run db:seed`.

@@ -1,0 +1,52 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-geist-sans: "Inter", system-ui, sans-serif;
+  --font-geist-mono: "JetBrains Mono", ui-monospace, "SF Mono", monospace;
+}
+
+* {
+  border-color: theme("colors.border");
+}
+
+html,
+body {
+  background-color: #0b0e14;
+  color: #e6e9f0;
+}
+
+body {
+  font-family: var(--font-geist-sans);
+}
+
+.font-mono-data {
+  font-family: var(--font-geist-mono);
+  font-feature-settings: "tnum";
+  font-variant-numeric: tabular-nums;
+}
+
+/* Subtle scrollbar styling for a polished financial-terminal feel */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0b0e14;
+}
+::-webkit-scrollbar-thumb {
+  background: #222838;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #2d3548;
+}
+
+/* Card hover lift */
+.card-hover {
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+.card-hover:hover {
+  border-color: #2d3548;
+}
