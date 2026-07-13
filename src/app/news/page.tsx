@@ -1,6 +1,6 @@
 import { Newspaper } from "lucide-react";
 import NewsTimeline from "@/components/NewsTimeline";
-import { getNewsEvents } from "@/lib/queries";
+import { getNewsEvents } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
 

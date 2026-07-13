@@ -1,6 +1,6 @@
 import { Sparkles } from "lucide-react";
 import InsightCard from "@/components/InsightCard";
-import { getInsights } from "@/lib/queries";
+import { getInsights } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
 

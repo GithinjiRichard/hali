@@ -1,4 +1,4 @@
-import { getPriceHistory } from "@/lib/queries";
+import { getPriceHistory } from "@/lib/data";
 import TrendsClient from "./TrendsClient";
 
 export const dynamic = "force-dynamic";

@@ -11,7 +11,7 @@ import {
   getPriceHistory,
   getInsights,
   getNewsEvents,
-} from "@/lib/queries";
+} from "@/lib/data";
 
 export const dynamic = "force-dynamic";
 

@@ -209,4 +209,3 @@ Vercel's serverless filesystem is **read-only at runtime except for `/tmp`**, bu
 ## License
 
 This is an MVP/demo project provided as-is for evaluation and prototyping purposes. All price data is mock/sample data and does not reflect real EPRA pricing.
-
