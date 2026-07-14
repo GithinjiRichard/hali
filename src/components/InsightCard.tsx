@@ -34,7 +34,7 @@ export default function InsightCard({ insight }: { insight: Insight }) {
   const Icon = config.icon;
 
   return (
-    <div className="card-hover rounded-xl border border-border bg-surface p-5 shadow-card flex flex-col gap-3">
+    <div className="card-hover rounded-xl border border-border dark:border-borderDark bg-surface dark:bg-surfaceDark p-5 shadow-card dark:shadow-cardDark flex flex-col gap-3">
       <div className="flex items-start justify-between gap-3">
         <div
           className={clsx(
@@ -46,19 +46,19 @@ export default function InsightCard({ insight }: { insight: Insight }) {
           {config.label}
         </div>
         {insight.commodity_name && (
-          <span className="text-[11px] text-muted font-mono-data text-right">
+          <span className="text-[11px] text-muted dark:text-mutedDark font-mono-data text-right">
             {insight.commodity_name}
           </span>
         )}
       </div>
 
-      <h3 className="font-semibold text-gray-100 text-sm leading-snug">
+      <h3 className="font-semibold text-gray-900 dark:text-gray-100 text-sm leading-snug">
         {insight.title}
       </h3>
 
-      <p className="text-sm text-gray-400 leading-relaxed">{insight.content}</p>
+      <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{insight.content}</p>
 
-      <div className="text-[11px] text-muted font-mono-data mt-1 pt-3 border-t border-border">
+      <div className="text-[11px] text-muted dark:text-mutedDark font-mono-data mt-1 pt-3 border-t border-border dark:border-borderDark">
         {formatDate(insight.period_date)}
       </div>
     </div>

@@ -1,12 +1,65 @@
 import type { Metadata } from "next";
+import { Inter, Fraunces, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
+import { ThemeProvider } from "@/components/ThemeProvider";
+
+const bodyFont = Inter({
+  subsets: ["latin"],
+  variable: "--font-body",
+  display: "swap",
+});
+
+const displayFont = Fraunces({
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  variable: "--font-display",
+  display: "swap",
+});
+
+const dataFont = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-data",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
-  title: "Kenya Fuel Intelligence",
+  title: "Hali — Fuel & Energy Prices Across East Africa",
   description:
-    "Real-time fuel price intelligence for Kenya — track Super Petrol, Diesel, and Kerosene prices, historical trends, and market insights.",
+    "Hali tracks fuel and energy prices across East Africa in plain language — Super Petrol, Diesel and Kerosene prices, trends, and what's driving them, starting with Kenya.",
+  openGraph: {
+    title: "Hali — Fuel & Energy Prices Across East Africa",
+    description:
+      "Today's fuel prices, explained simply. Starting with Kenya, expanding across East Africa.",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "Hali — Fuel & Energy Prices Across East Africa",
+    description: "Today's fuel prices, explained simply.",
+  },
 };
+
+export const viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f6f7fb" },
+    { media: "(prefers-color-scheme: dark)", color: "#0b0e14" },
+  ],
+};
+
+// Runs before React hydrates so the correct theme class is applied to <html>
+// immediately — this avoids a light-then-dark (or dark-then-light) flash on
+// load. Default is always light unless the person previously chose dark.
+const themeInitScript = `
+(function() {
+  try {
+    var stored = window.localStorage.getItem('hali-theme');
+    if (stored === 'dark') {
+      document.documentElement.classList.add('dark');
+    }
+  } catch (e) {}
+})();
+`;
 
 export default function RootLayout({
   children,
@@ -14,21 +67,32 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className="min-h-screen bg-background text-gray-100 antialiased">
-        <Navbar />
-        <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-          {children}
-        </main>
-        <footer className="border-t border-border mt-16">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 text-xs text-muted flex flex-col sm:flex-row justify-between gap-2">
-            <span>
-              &copy; {new Date().getFullYear()} Kenya Fuel Intelligence. Sample
-              data for demonstration purposes only.
-            </span>
-            <span>Data refreshed monthly · Source: EPRA (mock)</span>
-          </div>
-        </footer>
+    <html lang="en" className={`${bodyFont.variable} ${displayFont.variable} ${dataFont.variable}`}>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
+      <body className="min-h-screen bg-background dark:bg-backgroundDark text-gray-900 dark:text-gray-100 antialiased">
+        <ThemeProvider>
+          <Navbar />
+          <main>{children}</main>
+          <footer className="border-t border-border dark:border-borderDark mt-16 bg-surface dark:bg-surfaceDark">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 flex flex-col sm:flex-row justify-between gap-3">
+              <div className="flex flex-col gap-1">
+                <span className="font-display font-semibold text-gray-900 dark:text-gray-100">
+                  Hali
+                </span>
+                <span className="text-xs text-muted dark:text-mutedDark max-w-md">
+                  Fuel and energy price intelligence for East Africa, explained
+                  simply. Sample data for demonstration purposes only.
+                </span>
+              </div>
+              <div className="text-xs text-muted dark:text-mutedDark sm:text-right">
+                <div>Data refreshed monthly &middot; Source: EPRA (mock)</div>
+                <div>&copy; {new Date().getFullYear()} Hali</div>
+              </div>
+            </div>
+          </footer>
+        </ThemeProvider>
       </body>
     </html>
   );

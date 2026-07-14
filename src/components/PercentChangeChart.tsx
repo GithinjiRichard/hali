@@ -11,6 +11,7 @@ import {
   Cell,
 } from "recharts";
 import type { HistoryPoint } from "@/lib/types";
+import { useTheme } from "./ThemeProvider";
 
 function formatMonth(dateStr: string) {
   try {
@@ -54,8 +55,8 @@ function CustomTooltip({
   const isUp = point.change >= 0;
 
   return (
-    <div className="rounded-lg border border-border bg-surfaceLight px-3 py-2 shadow-card">
-      <p className="text-xs text-muted mb-1 font-mono-data">
+    <div className="rounded-lg border border-border dark:border-borderDark bg-surfaceLight dark:bg-surfaceLightDark px-3 py-2 shadow-card dark:shadow-cardDark">
+      <p className="text-xs text-muted dark:text-mutedDark mb-1 font-mono-data">
         {formatMonth(point.period_date)}
       </p>
       <p
@@ -79,36 +80,41 @@ export default function PercentChangeChart({
   commodityKey: "petrol" | "diesel" | "kerosene";
   color: string;
 }) {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  const gridColor = isDark ? "#222838" : "#e4e7ef";
+  const axisColor = isDark ? "#7d869c" : "#667085";
+  const cursorColor = isDark ? "#1a1f2e" : "#f0f2f7";
   const changes = computeChanges(data, commodityKey);
 
   return (
     <ResponsiveContainer width="100%" height={220}>
       <BarChart data={changes} margin={{ top: 10, right: 16, left: 0, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#222838" vertical={false} />
+        <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
         <XAxis
           dataKey="period_date"
           tickFormatter={formatMonth}
-          stroke="#7d869c"
+          stroke={axisColor}
           fontSize={11}
           tickLine={false}
-          axisLine={{ stroke: "#222838" }}
+          axisLine={{ stroke: gridColor }}
           interval={Math.max(0, Math.floor(changes.length / 12))}
         />
         <YAxis
-          stroke="#7d869c"
+          stroke={axisColor}
           fontSize={11}
           tickLine={false}
-          axisLine={{ stroke: "#222838" }}
+          axisLine={{ stroke: gridColor }}
           tickFormatter={(v: number) => `${v}%`}
           width={40}
         />
-        <Tooltip content={<CustomTooltip />} cursor={{ fill: "#1a1f2e" }} />
+        <Tooltip content={<CustomTooltip />} cursor={{ fill: cursorColor }} />
         <Bar dataKey="change" radius={[2, 2, 0, 0]}>
           {changes.map((entry, idx) => (
             <Cell
               key={`cell-${idx}`}
-              fill={entry.change >= 0 ? "#ef4444" : color}
-              opacity={entry.change >= 0 ? 0.85 : 0.85}
+              fill={entry.change >= 0 ? "#dc2626" : color}
+              opacity={0.85}
             />
           ))}
         </Bar>
