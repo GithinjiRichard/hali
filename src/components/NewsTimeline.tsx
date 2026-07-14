@@ -23,7 +23,7 @@ function formatDate(dateStr: string) {
 export default function NewsTimeline({ events }: { events: NewsEvent[] }) {
   return (
     <div className="relative">
-      <div className="absolute left-[7px] top-2 bottom-2 w-px bg-border" aria-hidden />
+      <div className="absolute left-[7px] top-2 bottom-2 w-px bg-border dark:bg-borderDark" aria-hidden />
       <ul className="flex flex-col gap-6">
         {events.map((event) => {
           const config = IMPACT_CONFIG[event.impact_level];
@@ -31,14 +31,14 @@ export default function NewsTimeline({ events }: { events: NewsEvent[] }) {
             <li key={event.id} className="relative pl-7">
               <span
                 className={clsx(
-                  "absolute left-0 top-1.5 h-3.5 w-3.5 rounded-full ring-4 ring-background",
+                  "absolute left-0 top-1.5 h-3.5 w-3.5 rounded-full ring-4 ring-background dark:ring-backgroundDark",
                   config.dot
                 )}
                 aria-hidden
               />
-              <div className="rounded-xl border border-border bg-surface p-4 shadow-card card-hover">
+              <div className="rounded-xl border border-border dark:border-borderDark bg-surface dark:bg-surfaceDark p-4 shadow-card dark:shadow-cardDark card-hover">
                 <div className="flex flex-wrap items-center gap-2 justify-between mb-2">
-                  <span className="text-xs text-muted font-mono-data">
+                  <span className="text-xs text-muted dark:text-mutedDark font-mono-data">
                     {formatDate(event.event_date)}
                   </span>
                   <span
@@ -50,14 +50,14 @@ export default function NewsTimeline({ events }: { events: NewsEvent[] }) {
                     {config.label}
                   </span>
                 </div>
-                <h3 className="font-semibold text-gray-100 text-sm mb-1.5">
+                <h3 className="font-semibold text-gray-900 dark:text-gray-100 text-sm mb-1.5">
                   {event.title}
                 </h3>
-                <p className="text-sm text-gray-400 leading-relaxed">
+                <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
                   {event.description}
                 </p>
                 {event.source && (
-                  <p className="text-[11px] text-muted mt-2 font-mono-data">
+                  <p className="text-[11px] text-muted dark:text-mutedDark mt-2 font-mono-data">
                     Source: {event.source}
                   </p>
                 )}

@@ -27,13 +27,13 @@ export default function PriceCard({ price }: { price: CurrentPrice }) {
   const isFlat = price.percentChange === 0;
 
   return (
-    <div className="card-hover rounded-xl border border-border bg-surface p-5 shadow-card flex flex-col gap-4">
+    <div className="card-hover rounded-xl border border-border dark:border-borderDark bg-surface dark:bg-surfaceDark p-5 shadow-card dark:shadow-cardDark flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="text-lg" aria-hidden>
             {ICONS[price.slug] ?? "⛽"}
           </span>
-          <h3 className="font-semibold text-gray-100 text-sm tracking-wide">
+          <h3 className="font-semibold text-gray-900 dark:text-gray-100 text-sm tracking-wide">
             {price.commodity}
           </h3>
         </div>
@@ -46,10 +46,10 @@ export default function PriceCard({ price }: { price: CurrentPrice }) {
 
       <div className="flex items-end justify-between">
         <div>
-          <div className="font-mono-data text-3xl font-bold text-white tracking-tight">
+          <div className="font-mono-data text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
             {price.currentPrice.toFixed(2)}
           </div>
-          <div className="text-xs text-muted mt-1">{price.unit}</div>
+          <div className="text-xs text-muted dark:text-mutedDark mt-1">{price.unit}</div>
         </div>
 
         <div
@@ -57,7 +57,7 @@ export default function PriceCard({ price }: { price: CurrentPrice }) {
             "flex items-center gap-1 rounded-md px-2 py-1 text-xs font-semibold font-mono-data",
             isUp && "bg-danger/10 text-danger",
             isDown && "bg-primary/10 text-primary",
-            isFlat && "bg-muted/10 text-muted"
+            isFlat && "bg-muted/10 text-muted dark:text-mutedDark"
           )}
         >
           {isUp && <ArrowUpRight size={14} />}
@@ -67,14 +67,14 @@ export default function PriceCard({ price }: { price: CurrentPrice }) {
         </div>
       </div>
 
-      <div className="border-t border-border pt-3 flex items-center justify-between text-xs">
-        <div className="text-muted">
+      <div className="border-t border-border dark:border-borderDark pt-3 flex items-center justify-between text-xs">
+        <div className="text-muted dark:text-mutedDark">
           Prev. month:{" "}
-          <span className="font-mono-data text-gray-300">
+          <span className="font-mono-data text-gray-600 dark:text-gray-300">
             KES {price.previousPrice.toFixed(2)}
           </span>
         </div>
-        <div className="text-muted">Updated {formatDate(price.lastUpdated)}</div>
+        <div className="text-muted dark:text-mutedDark">Updated {formatDate(price.lastUpdated)}</div>
       </div>
     </div>
   );

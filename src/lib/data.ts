@@ -73,9 +73,9 @@ const series = {
 export function getCurrentPrices(): CurrentPrice[] {
   const last = MONTHS.length - 1;
   const commodities: { name: string; slug: CommoditySlug; color: string }[] = [
-    { name: "Super Petrol", slug: "petrol", color: "#22c55e" },
-    { name: "Diesel", slug: "diesel", color: "#3b82f6" },
-    { name: "Kerosene", slug: "kerosene", color: "#f59e0b" },
+    { name: "Super Petrol", slug: "petrol", color: "#16a34a" },
+    { name: "Diesel", slug: "diesel", color: "#2563eb" },
+    { name: "Kerosene", slug: "kerosene", color: "#d97706" },
   ];
 
   return commodities.map((c) => {
@@ -214,6 +214,43 @@ export function getNewsEvents(): NewsEvent[] {
       impact_level: "low",
       source: "EPRA Regulatory Notice",
     },
+  ];
+}
+
+// ---------------------------------------------------------------------------
+// East African Community snapshot — powers the landing page's expansion grid.
+// Kenya is live with real (mock) tracked data today; the rest of the EAC's 8
+// partner states are shown as "Coming soon" so people can see where Hali is
+// headed next. No invented prices are shown for markets we don't track yet.
+// ---------------------------------------------------------------------------
+
+export interface CountrySnapshot {
+  code: string;
+  name: string;
+  flag: string;
+  status: "live" | "coming_soon";
+  petrolPrice?: number;
+  currency?: string;
+}
+
+export function getEastAfricaSnapshot(): CountrySnapshot[] {
+  const petrol = getCurrentPrices().find((p) => p.slug === "petrol");
+  return [
+    {
+      code: "KE",
+      name: "Kenya",
+      flag: "🇰🇪",
+      status: "live",
+      petrolPrice: petrol?.currentPrice,
+      currency: "KES",
+    },
+    { code: "UG", name: "Uganda", flag: "🇺🇬", status: "coming_soon" },
+    { code: "TZ", name: "Tanzania", flag: "🇹🇿", status: "coming_soon" },
+    { code: "RW", name: "Rwanda", flag: "🇷🇼", status: "coming_soon" },
+    { code: "BI", name: "Burundi", flag: "🇧🇮", status: "coming_soon" },
+    { code: "SS", name: "South Sudan", flag: "🇸🇸", status: "coming_soon" },
+    { code: "CD", name: "DR Congo", flag: "🇨🇩", status: "coming_soon" },
+    { code: "SO", name: "Somalia", flag: "🇸🇴", status: "coming_soon" },
   ];
 }
 
