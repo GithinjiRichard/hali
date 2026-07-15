@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Playfair_Display, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
+import CountryNotice from "@/components/CountryNotice";
 import { ThemeProvider } from "@/components/ThemeProvider";
 
 const bodyFont = Inter({
@@ -75,6 +76,7 @@ export default function RootLayout({
       <body className="min-h-screen bg-background dark:bg-backgroundDark text-ink dark:text-inkDark antialiased">
         <div className="bg-grain-overlay" aria-hidden="true" />
         <ThemeProvider>
+          <CountryNotice />
           <Navbar />
           <main>{children}</main>
           <footer className="border-t border-border dark:border-borderDark mt-16 bg-surface dark:bg-surfaceDark">

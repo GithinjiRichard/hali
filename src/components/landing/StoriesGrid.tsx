@@ -19,7 +19,7 @@ export default function StoriesGrid({
           What&apos;s happening now
         </h2>
         <p className="text-muted dark:text-mutedDark text-sm mt-1">
-          Fuel stories that affect your life, explained simply
+          Kenyan fuel stories that affect your life, explained simply
         </p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
