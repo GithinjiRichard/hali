@@ -7,9 +7,9 @@ import PercentChangeChart from "@/components/PercentChangeChart";
 import type { HistoryPoint } from "@/lib/types";
 
 const COMMODITIES = [
-  { key: "petrol" as const, label: "Super Petrol", color: "#16a34a" },
-  { key: "diesel" as const, label: "Diesel", color: "#2563eb" },
-  { key: "kerosene" as const, label: "Kerosene", color: "#d97706" },
+  { key: "petrol" as const, label: "Super Petrol", color: "#B8860B" },
+  { key: "diesel" as const, label: "Diesel", color: "#8B4513" },
+  { key: "kerosene" as const, label: "Kerosene", color: "#4A6670" },
 ];
 
 export default function TrendsClient({ data }: { data: HistoryPoint[] }) {
@@ -34,7 +34,7 @@ export default function TrendsClient({ data }: { data: HistoryPoint[] }) {
       {/* Combined trend chart */}
       <section className="rounded-xl border border-border dark:border-borderDark bg-surface dark:bg-surfaceDark p-5 shadow-card dark:shadow-cardDark">
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-          <h2 className="font-semibold text-gray-900 dark:text-gray-100">Combined Price Trend</h2>
+          <h2 className="font-semibold text-ink dark:text-inkDark">Combined Price Trend</h2>
           <div className="flex items-center gap-2">
             {COMMODITIES.map((c) => (
               <button
@@ -43,7 +43,7 @@ export default function TrendsClient({ data }: { data: HistoryPoint[] }) {
                 className={clsx(
                   "flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-medium transition-colors",
                   active.has(c.key)
-                    ? "border-border dark:border-borderDark bg-surfaceLight dark:bg-surfaceLightDark text-gray-800 dark:text-gray-200"
+                    ? "border-border dark:border-borderDark bg-surfaceLight dark:bg-surfaceLightDark text-ink dark:text-inkDark"
                     : "border-border dark:border-borderDark text-muted dark:text-mutedDark opacity-50 hover:opacity-80"
                 )}
               >
@@ -71,7 +71,7 @@ export default function TrendsClient({ data }: { data: HistoryPoint[] }) {
                 className="inline-block h-2 w-2 rounded-full"
                 style={{ backgroundColor: c.color }}
               />
-              <h3 className="font-semibold text-gray-900 dark:text-gray-100 text-sm">
+              <h3 className="font-semibold text-ink dark:text-inkDark text-sm">
                 {c.label} &mdash; MoM % Change
               </h3>
             </div>
@@ -82,7 +82,7 @@ export default function TrendsClient({ data }: { data: HistoryPoint[] }) {
 
       {/* Data table */}
       <section className="rounded-xl border border-border dark:border-borderDark bg-surface dark:bg-surfaceDark p-5 shadow-card dark:shadow-cardDark overflow-x-auto">
-        <h2 className="font-semibold text-gray-900 dark:text-gray-100 mb-4">
+        <h2 className="font-semibold text-ink dark:text-inkDark mb-4">
           Monthly Price History (Nairobi)
         </h2>
         <table className="w-full text-sm font-mono-data">
@@ -105,19 +105,19 @@ export default function TrendsClient({ data }: { data: HistoryPoint[] }) {
                   key={row.period_date}
                   className="border-b border-border/60 dark:border-borderDark/60 hover:bg-surfaceLight dark:hover:bg-surfaceLightDark"
                 >
-                  <td className="py-2 pr-4 text-gray-600 dark:text-gray-300">
+                  <td className="py-2 pr-4 text-muted dark:text-mutedDark">
                     {new Date(row.period_date).toLocaleDateString("en-KE", {
                       month: "short",
                       year: "numeric",
                     })}
                   </td>
-                  <td className="py-2 pr-4 text-right text-gray-800 dark:text-gray-200">
+                  <td className="py-2 pr-4 text-right text-ink dark:text-inkDark">
                     {row.petrol.toFixed(2)}
                   </td>
-                  <td className="py-2 pr-4 text-right text-gray-800 dark:text-gray-200">
+                  <td className="py-2 pr-4 text-right text-ink dark:text-inkDark">
                     {row.diesel.toFixed(2)}
                   </td>
-                  <td className="py-2 pr-4 text-right text-gray-800 dark:text-gray-200">
+                  <td className="py-2 pr-4 text-right text-ink dark:text-inkDark">
                     {row.kerosene.toFixed(2)}
                   </td>
                 </tr>

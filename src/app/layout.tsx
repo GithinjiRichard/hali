@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Fraunces, JetBrains_Mono } from "next/font/google";
+import { Inter, Playfair_Display, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import { ThemeProvider } from "@/components/ThemeProvider";
@@ -10,9 +10,10 @@ const bodyFont = Inter({
   display: "swap",
 });
 
-const displayFont = Fraunces({
+const displayFont = Playfair_Display({
   subsets: ["latin"],
-  weight: ["500", "600", "700"],
+  weight: ["500", "600", "700", "800"],
+  style: ["normal", "italic"],
   variable: "--font-display",
   display: "swap",
 });
@@ -42,8 +43,8 @@ export const metadata: Metadata = {
 
 export const viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f6f7fb" },
-    { media: "(prefers-color-scheme: dark)", color: "#0b0e14" },
+    { media: "(prefers-color-scheme: light)", color: "#FAF8F4" },
+    { media: "(prefers-color-scheme: dark)", color: "#17140F" },
   ],
 };
 
@@ -71,14 +72,15 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
-      <body className="min-h-screen bg-background dark:bg-backgroundDark text-gray-900 dark:text-gray-100 antialiased">
+      <body className="min-h-screen bg-background dark:bg-backgroundDark text-ink dark:text-inkDark antialiased">
+        <div className="bg-grain-overlay" aria-hidden="true" />
         <ThemeProvider>
           <Navbar />
           <main>{children}</main>
           <footer className="border-t border-border dark:border-borderDark mt-16 bg-surface dark:bg-surfaceDark">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 flex flex-col sm:flex-row justify-between gap-3">
               <div className="flex flex-col gap-1">
-                <span className="font-display font-semibold text-gray-900 dark:text-gray-100">
+                <span className="font-display font-semibold text-ink dark:text-inkDark">
                   Hali
                 </span>
                 <span className="text-xs text-muted dark:text-mutedDark max-w-md">

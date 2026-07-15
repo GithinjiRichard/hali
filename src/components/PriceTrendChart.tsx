@@ -14,9 +14,9 @@ import type { HistoryPoint } from "@/lib/types";
 import { useTheme } from "./ThemeProvider";
 
 const SERIES = [
-  { key: "petrol", name: "Super Petrol", color: "#16a34a" },
-  { key: "diesel", name: "Diesel", color: "#2563eb" },
-  { key: "kerosene", name: "Kerosene", color: "#d97706" },
+  { key: "petrol", name: "Super Petrol", color: "#B8860B" },
+  { key: "diesel", name: "Diesel", color: "#8B4513" },
+  { key: "kerosene", name: "Kerosene", color: "#4A6670" },
 ] as const;
 
 function formatMonth(dateStr: string) {
@@ -55,14 +55,14 @@ function CustomTooltip({
           key={entry.name}
           className="flex items-center justify-between gap-3 text-xs"
         >
-          <span className="flex items-center gap-1.5 text-gray-600 dark:text-gray-300">
+          <span className="flex items-center gap-1.5 text-muted dark:text-mutedDark">
             <span
               className="inline-block h-2 w-2 rounded-full"
               style={{ backgroundColor: entry.color }}
             />
             {entry.name}
           </span>
-          <span className="font-mono-data font-semibold text-gray-900 dark:text-white">
+          <span className="font-mono-data font-semibold text-ink dark:text-inkDark">
             KES {entry.value.toFixed(2)}
           </span>
         </div>

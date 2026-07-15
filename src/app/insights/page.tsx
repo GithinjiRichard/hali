@@ -13,7 +13,7 @@ export default function InsightsPage() {
       <div className="flex flex-col gap-1.5">
         <div className="flex items-center gap-2">
           <Sparkles size={20} className="text-accent" />
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">
+          <h1 className="text-2xl font-bold text-ink dark:text-inkDark tracking-tight">
             Market Insights
           </h1>
         </div>

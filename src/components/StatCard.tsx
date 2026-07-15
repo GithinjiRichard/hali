@@ -35,7 +35,7 @@ export default function StatCard({
       </div>
       <div className="flex flex-col min-w-0">
         <span className="text-xs text-muted dark:text-mutedDark truncate">{label}</span>
-        <span className="font-mono-data text-xl font-bold text-gray-900 dark:text-white truncate">
+        <span className="font-mono-data text-xl font-bold text-ink dark:text-inkDark truncate">
           {value}
         </span>
         {sublabel && (

@@ -31,6 +31,7 @@ export interface CurrentPrice {
   previousPrice: number;
   percentChange: number;
   lastUpdated: string;
+  sourceLabel: string;
 }
 
 export interface HistoryPoint {
@@ -65,4 +66,47 @@ export interface DashboardStats {
   currentKerosene: number;
   highest24m: { commodity: string; price: number; period_date: string };
   lowest24m: { commodity: string; price: number; period_date: string };
+}
+
+export interface Factor {
+  direction: "up" | "down";
+  text: string;
+}
+
+export interface CommodityDetail {
+  slug: CommoditySlug;
+  subtext: string;
+  simple: string;
+  factors: Factor[];
+}
+
+export interface Story {
+  id: number;
+  title: string;
+  excerpt: string;
+  commodity: CommoditySlug;
+  tags: string[];
+  imgSeed: string;
+  big: boolean;
+}
+
+export interface BudgetShare {
+  code: string;
+  name: string;
+  flag: string;
+  sharePct: number;
+  live: boolean;
+}
+
+export interface PerspectiveItem {
+  icon: string;
+  title: string;
+  text: string;
+}
+
+export type PerspectiveKey = "citizen" | "business" | "government";
+
+export interface YearPoint {
+  year: number;
+  price: number;
 }

@@ -29,7 +29,7 @@ export default function DashboardPage() {
       <div className="flex flex-col gap-8">
         {/* Page header */}
         <div className="flex flex-col gap-1.5">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">
+          <h1 className="text-2xl font-bold text-ink dark:text-inkDark tracking-tight">
             Fuel Price Dashboard
           </h1>
           <p className="text-sm text-muted dark:text-mutedDark">
@@ -87,7 +87,7 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <BarChart3 size={18} className="text-accent" />
-              <h2 className="font-semibold text-gray-900 dark:text-gray-100">
+              <h2 className="font-semibold text-ink dark:text-inkDark">
                 24-Month Price Trend &mdash; Nairobi
               </h2>
             </div>
@@ -104,7 +104,7 @@ export default function DashboardPage() {
         {/* Insights preview */}
         <section className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
-            <h2 className="font-semibold text-gray-900 dark:text-gray-100">Market Insights</h2>
+            <h2 className="font-semibold text-ink dark:text-inkDark">Market Insights</h2>
             <Link
               href="/insights"
               className="text-xs text-accent hover:underline font-medium"
@@ -122,7 +122,7 @@ export default function DashboardPage() {
         {/* News preview */}
         <section className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
-            <h2 className="font-semibold text-gray-900 dark:text-gray-100">Latest News &amp; Events</h2>
+            <h2 className="font-semibold text-ink dark:text-inkDark">Latest News &amp; Events</h2>
             <Link
               href="/news"
               className="text-xs text-accent hover:underline font-medium"

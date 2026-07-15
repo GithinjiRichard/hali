@@ -11,6 +11,12 @@ import type {
   Insight,
   NewsEvent,
   CommoditySlug,
+  CommodityDetail,
+  Story,
+  BudgetShare,
+  PerspectiveItem,
+  PerspectiveKey,
+  YearPoint,
 } from "./types";
 
 // ---------------------------------------------------------------------------
@@ -73,9 +79,9 @@ const series = {
 export function getCurrentPrices(): CurrentPrice[] {
   const last = MONTHS.length - 1;
   const commodities: { name: string; slug: CommoditySlug; color: string }[] = [
-    { name: "Super Petrol", slug: "petrol", color: "#16a34a" },
-    { name: "Diesel", slug: "diesel", color: "#2563eb" },
-    { name: "Kerosene", slug: "kerosene", color: "#d97706" },
+    { name: "Super Petrol", slug: "petrol", color: "#B8860B" },
+    { name: "Diesel", slug: "diesel", color: "#8B4513" },
+    { name: "Kerosene", slug: "kerosene", color: "#4A6670" },
   ];
 
   return commodities.map((c) => {
@@ -92,6 +98,7 @@ export function getCurrentPrices(): CurrentPrice[] {
       previousPrice: previous,
       percentChange,
       lastUpdated: MONTHS[last],
+      sourceLabel: "EPRA monthly pump price circular (Kenya)",
     };
   });
 }
@@ -331,4 +338,234 @@ export function getInsights(): Insight[] {
       period_date: prevPeriod,
     },
   ];
+}
+
+// ---------------------------------------------------------------------------
+// "Why is this happening?" panel — a few plain-language factors and a one
+// -paragraph explanation per commodity, used on the landing page's Explore
+// section. Kept separate from getInsights() because these are meant to read
+// like a quick glossary, not a dated market note.
+// ---------------------------------------------------------------------------
+
+export function getCommodityDetail(slug: CommoditySlug): CommodityDetail {
+  const details: Record<CommoditySlug, CommodityDetail> = {
+    petrol: {
+      slug: "petrol",
+      subtext: "What moves your car, boda, or matatu",
+      simple:
+        "Kenya imports nearly all its petrol, so it's priced in US Dollars before it ever reaches a pump. When crude oil gets pricier globally or the Shilling weakens, importers pay more — and EPRA passes that through at the next monthly review.",
+      factors: [
+        { direction: "up", text: "Brent crude climbing on global markets" },
+        { direction: "up", text: "Shilling softening against the US Dollar" },
+        { direction: "down", text: "Lower shipping costs from Gulf refiners" },
+        { direction: "up", text: "Fuel levies unchanged in the latest budget" },
+      ],
+    },
+    diesel: {
+      slug: "diesel",
+      subtext: "What moves goods, buses, and generators",
+      simple:
+        "Diesel prices track industry and farming demand closely. When trucks are hauling harvests or factories are running full shifts, diesel gets scarcer relative to petrol — and that scarcity shows up as a higher price at the pump.",
+      factors: [
+        { direction: "up", text: "Harvest season lifting transport demand" },
+        { direction: "up", text: "Higher landed cost from global shipping" },
+        { direction: "down", text: "Government stabilization fund cushioning" },
+        { direction: "down", text: "Slower manufacturing output this quarter" },
+      ],
+    },
+    kerosene: {
+      slug: "kerosene",
+      subtext: "What lights and cooks in many homes",
+      simple:
+        "Kerosene shares the same import pipeline as diesel and petrol, so it usually rises and falls with them. It matters most to lower-income households, which is why small changes here are felt disproportionately hard.",
+      factors: [
+        { direction: "up", text: "Shared import costs with diesel & petrol" },
+        { direction: "down", text: "Softer demand as more homes shift to gas" },
+        { direction: "up", text: "Weaker Shilling raising landed cost" },
+      ],
+    },
+  };
+  return details[slug];
+}
+
+// ---------------------------------------------------------------------------
+// Stories — short, human-first narratives that anchor the landing page.
+// Each links back into the Explore section for whoever wants the data.
+// ---------------------------------------------------------------------------
+
+export function getStories(): Story[] {
+  return [
+    {
+      id: 1,
+      title: "Why your boda ride just got a little more expensive",
+      excerpt:
+        "A weaker Shilling and firmer global crude prices pushed Super Petrol up again this cycle — and that few extra shillings a litre adds up fast for anyone earning a living on two wheels.",
+      commodity: "petrol",
+      tags: ["Petrol", "Cost of living"],
+      imgSeed: "boda-nairobi-street",
+      big: true,
+    },
+    {
+      id: 2,
+      title: "The harvest season squeeze: why diesel gets tight in Q2",
+      excerpt:
+        "Every planting and harvest season, trucks and tractors across the Rift Valley compete for the same diesel supply — and prices quietly firm up before most people notice.",
+      commodity: "diesel",
+      tags: ["Diesel", "Agriculture"],
+      imgSeed: "kenya-farm-truck",
+      big: false,
+    },
+    {
+      id: 3,
+      title: "Kerosene: the price that hits the hardest, quietest",
+      excerpt:
+        "It rarely makes headlines, but kerosene is still how many households light their evenings and cook their meals — which is why even a small increase is felt disproportionately.",
+      commodity: "kerosene",
+      tags: ["Kerosene", "Households"],
+      imgSeed: "kerosene-lamp-home",
+      big: false,
+    },
+    {
+      id: 4,
+      title: "EPRA's monthly review, explained without the jargon",
+      excerpt:
+        "Every month, one government body quietly resets what the whole country pays at the pump. Here's what actually goes into that number, in plain language.",
+      commodity: "petrol",
+      tags: ["EPRA", "How it works"],
+      imgSeed: "epra-fuel-station",
+      big: true,
+    },
+  ];
+}
+
+// ---------------------------------------------------------------------------
+// Fuel's weight on the wallet — illustrative share of an average monthly
+// income spent on fuel/transport across the East African Community. Kenya's
+// figure is derived from Hali's tracked pump price; every other country is
+// a rough, clearly-labelled illustrative estimate until Hali tracks it live.
+// ---------------------------------------------------------------------------
+
+export function getBudgetShare(): BudgetShare[] {
+  return [
+    { code: "SS", name: "South Sudan", flag: "🇸🇸", sharePct: 15.4, live: false },
+    { code: "BI", name: "Burundi", flag: "🇧🇮", sharePct: 12.1, live: false },
+    { code: "UG", name: "Uganda", flag: "🇺🇬", sharePct: 9.8, live: false },
+    { code: "CD", name: "DR Congo", flag: "🇨🇩", sharePct: 9.2, live: false },
+    { code: "SO", name: "Somalia", flag: "🇸🇴", sharePct: 8.6, live: false },
+    { code: "KE", name: "Kenya", flag: "🇰🇪", sharePct: 7.9, live: true },
+    { code: "TZ", name: "Tanzania", flag: "🇹🇿", sharePct: 6.8, live: false },
+    { code: "RW", name: "Rwanda", flag: "🇷🇼", sharePct: 6.1, live: false },
+  ];
+}
+
+// ---------------------------------------------------------------------------
+// "What does this mean for you?" — three lenses on the same price data.
+// ---------------------------------------------------------------------------
+
+export function getPerspectives(): Record<PerspectiveKey, PerspectiveItem[]> {
+  return {
+    citizen: [
+      {
+        icon: "ShoppingCart",
+        title: "Your matatu fare",
+        text: "Fare hikes usually follow pump prices with a lag of a week or two, as SACCOs pass on higher fuel costs to commuters on popular routes.",
+      },
+      {
+        icon: "Bike",
+        title: "Your boda income",
+        text: "For riders paid per trip, a few shillings more per litre eats directly into take-home pay — often before any fare adjustment catches up.",
+      },
+      {
+        icon: "Flame",
+        title: "Your kitchen",
+        text: "Households still using kerosene for cooking or lighting feel price rises immediately, with no cushion from subsidies that mostly target petrol and diesel.",
+      },
+      {
+        icon: "Home",
+        title: "Everything you buy",
+        text: "Diesel powers the trucks that move food and goods across the country, so fuel costs quietly ride along inside almost every price tag.",
+      },
+    ],
+    business: [
+      {
+        icon: "Truck",
+        title: "Logistics & delivery",
+        text: "Transport and courier businesses often run on thin margins — a sustained diesel increase can force a choice between raising delivery fees or absorbing the hit.",
+      },
+      {
+        icon: "Factory",
+        title: "Manufacturing costs",
+        text: "Factories relying on diesel generators during outages see production costs rise directly with every pump price review.",
+      },
+      {
+        icon: "TrendingUp",
+        title: "Pricing decisions",
+        text: "Retailers and SMEs use EPRA's monthly announcement as a natural checkpoint to review their own pricing, rather than adjusting reactively all month.",
+      },
+      {
+        icon: "Fuel",
+        title: "Fleet planning",
+        text: "Businesses with vehicle fleets increasingly time refueling and route planning around the monthly price cycle to manage costs predictably.",
+      },
+    ],
+    government: [
+      {
+        icon: "Landmark",
+        title: "Subsidy burden",
+        text: "The fuel price stabilization mechanism cushions consumers from sharp swings, but sustained global increases can strain the fund meant to absorb them.",
+      },
+      {
+        icon: "Coins",
+        title: "Inflation management",
+        text: "Fuel feeds into the cost of nearly everything, so pump prices are one of the most closely watched inputs to the country's overall inflation picture.",
+      },
+      {
+        icon: "Scale",
+        title: "Balancing revenue & relief",
+        text: "Fuel levies are a meaningful source of government revenue, creating a constant balancing act between funding public services and easing costs for citizens.",
+      },
+      {
+        icon: "Globe2",
+        title: "Regional coordination",
+        text: "As EAC neighbors track and compare pump prices more closely, cross-border fuel policy and smuggling incentives become harder to ignore.",
+      },
+    ],
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Since Independence — a long-run, deterministic annual mock series for
+// Super Petrol from 1963 to today. Powers the landing page's "All-time"
+// view so people can see the decades-long story, not just 24 months of it.
+// Figures are illustrative/mock, not an audited historical record.
+// ---------------------------------------------------------------------------
+
+export function getSinceIndependenceSeries(): YearPoint[] {
+  const startYear = 1963;
+  const endYear = 2026;
+  const startPrice = 1.15; // illustrative shillings/litre at independence
+  const endPrice = series.petrol[series.petrol.length - 1];
+
+  const rand = seededRandom(1963);
+  const years = endYear - startYear;
+  const points: YearPoint[] = [];
+
+  // Smooth exponential-ish glide path from start to end, with mild seeded
+  // noise and a few sharper illustrative shocks (oil crises, liberalization,
+  // recent currency pressure) so the shape reads as a believable history.
+  for (let i = 0; i <= years; i++) {
+    const t = i / years;
+    const base = startPrice * Math.pow(endPrice / startPrice, t);
+    const noise = (rand() - 0.5) * base * 0.06;
+    let shock = 0;
+    const year = startYear + i;
+    if (year === 1974 || year === 1979) shock = base * 0.35; // 1970s oil crises
+    if (year === 1993) shock = base * 0.4; // market liberalization
+    if (year === 2008) shock = base * 0.2; // global financial crisis
+    if (year === 2022) shock = base * 0.18; // recent global energy shock
+    points.push({ year, price: Math.round((base + noise + shock) * 100) / 100 });
+  }
+  // Force the final point to match today's tracked price exactly.
+  points[points.length - 1].price = endPrice;
+  return points;
 }

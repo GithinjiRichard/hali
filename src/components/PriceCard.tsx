@@ -33,7 +33,7 @@ export default function PriceCard({ price }: { price: CurrentPrice }) {
           <span className="text-lg" aria-hidden>
             {ICONS[price.slug] ?? "⛽"}
           </span>
-          <h3 className="font-semibold text-gray-900 dark:text-gray-100 text-sm tracking-wide">
+          <h3 className="font-semibold text-ink dark:text-inkDark text-sm tracking-wide">
             {price.commodity}
           </h3>
         </div>
@@ -46,7 +46,7 @@ export default function PriceCard({ price }: { price: CurrentPrice }) {
 
       <div className="flex items-end justify-between">
         <div>
-          <div className="font-mono-data text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
+          <div className="font-mono-data text-3xl font-bold text-ink dark:text-inkDark tracking-tight">
             {price.currentPrice.toFixed(2)}
           </div>
           <div className="text-xs text-muted dark:text-mutedDark mt-1">{price.unit}</div>
@@ -70,7 +70,7 @@ export default function PriceCard({ price }: { price: CurrentPrice }) {
       <div className="border-t border-border dark:border-borderDark pt-3 flex items-center justify-between text-xs">
         <div className="text-muted dark:text-mutedDark">
           Prev. month:{" "}
-          <span className="font-mono-data text-gray-600 dark:text-gray-300">
+          <span className="font-mono-data text-muted dark:text-mutedDark">
             KES {price.previousPrice.toFixed(2)}
           </span>
         </div>
