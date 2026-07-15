@@ -52,11 +52,11 @@ export default function InsightCard({ insight }: { insight: Insight }) {
         )}
       </div>
 
-      <h3 className="font-semibold text-gray-900 dark:text-gray-100 text-sm leading-snug">
+      <h3 className="font-semibold text-ink dark:text-inkDark text-sm leading-snug">
         {insight.title}
       </h3>
 
-      <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{insight.content}</p>
+      <p className="text-sm text-muted dark:text-mutedDark leading-relaxed">{insight.content}</p>
 
       <div className="text-[11px] text-muted dark:text-mutedDark font-mono-data mt-1 pt-3 border-t border-border dark:border-borderDark">
         {formatDate(insight.period_date)}

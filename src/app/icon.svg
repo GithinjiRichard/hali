@@ -1,4 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
-  <rect width="64" height="64" rx="16" fill="#16a34a"/>
-  <text x="32" y="44" font-family="Georgia, 'Times New Roman', serif" font-size="34" font-weight="600" fill="#ffffff" text-anchor="middle">H</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="64" height="64">
+  <rect width="48" height="48" rx="13" fill="#B8860B"/>
+  <path d="M14 10 C14 10 12 10 12 12 L12 36 C12 38 14 38 14 38 C14 38 16 38 16 36 L16 12 C16 10 14 10 14 10Z" fill="#FAF8F4"/>
+  <path d="M34 10 C34 10 32 10 32 12 L32 36 C32 38 34 38 34 38 C34 38 36 38 36 36 L36 12 C36 10 34 10 34 10Z" fill="#FAF8F4"/>
+  <rect x="14" y="21.5" width="20" height="5" rx="2.5" fill="#FAF8F4"/>
+  <path d="M24 16.5c2.6 3 4.2 5.2 4.2 7.6a4.2 4.2 0 1 1-8.4 0c0-2.4 1.6-4.6 4.2-7.6Z" fill="#B8860B"/>
 </svg>

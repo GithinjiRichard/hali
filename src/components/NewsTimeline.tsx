@@ -50,10 +50,10 @@ export default function NewsTimeline({ events }: { events: NewsEvent[] }) {
                     {config.label}
                   </span>
                 </div>
-                <h3 className="font-semibold text-gray-900 dark:text-gray-100 text-sm mb-1.5">
+                <h3 className="font-semibold text-ink dark:text-inkDark text-sm mb-1.5">
                   {event.title}
                 </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                <p className="text-sm text-muted dark:text-mutedDark leading-relaxed">
                   {event.description}
                 </p>
                 {event.source && (

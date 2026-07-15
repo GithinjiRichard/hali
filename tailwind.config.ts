@@ -6,25 +6,39 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Light theme (default)
-        background: "#f6f7fb",
-        surface: "#ffffff",
-        surfaceLight: "#f0f2f7",
-        border: "#e4e7ef",
-        primary: "#16a34a",
-        danger: "#dc2626",
-        accent: "#2563eb",
-        muted: "#667085",
+        // ---------------------------------------------------------------
+        // Light theme (default) — warm editorial cream & goldenrod, tuned
+        // to feel like a considered publication rather than a data
+        // terminal. "primary" = good news (green), "danger" = bad news
+        // (red), "accent" = brand/CTA (gold).
+        // ---------------------------------------------------------------
+        background: "#FAF8F4",
+        surface: "#FFFFFF",
+        surfaceLight: "#F2EFE8",
+        border: "#E8E4DC",
+        borderLight: "#D6D0C6",
+        ink: "#1A1714",
+        primary: "#1B7A3D",
+        danger: "#C0392B",
+        accent: "#B8860B",
+        accentLight: "#D4A017",
+        warning: "#B8720A",
+        muted: "#6B6560",
 
-        // Dark theme counterparts (activated via the `dark:` variant)
-        backgroundDark: "#0b0e14",
-        surfaceDark: "#11151f",
-        surfaceLightDark: "#161b29",
-        borderDark: "#222838",
-        primaryDark: "#22c55e",
-        dangerDark: "#ef4444",
-        accentDark: "#3b82f6",
-        mutedDark: "#7d869c",
+        // ---------------------------------------------------------------
+        // Dark theme counterparts (activated via the `dark:` variant) —
+        // warm charcoal, not navy, so the palette feels like one family.
+        // ---------------------------------------------------------------
+        backgroundDark: "#17140F",
+        surfaceDark: "#211D17",
+        surfaceLightDark: "#2A241C",
+        borderDark: "#3A332A",
+        inkDark: "#F5F1EA",
+        primaryDark: "#34A65B",
+        dangerDark: "#E2604B",
+        accentDark: "#E0B23A",
+        warningDark: "#E0A23A",
+        mutedDark: "#A39C92",
       },
       fontFamily: {
         sans: ["var(--font-body)", "Inter", "system-ui", "sans-serif"],
@@ -32,13 +46,14 @@ const config: Config = {
         mono: ["var(--font-data)", "ui-monospace", "monospace"],
       },
       boxShadow: {
-        card: "0 1px 3px 0 rgba(16,24,40,0.06), 0 1px 2px -1px rgba(16,24,40,0.06)",
+        card: "0 1px 3px 0 rgba(26,23,20,0.06), 0 1px 2px -1px rgba(26,23,20,0.06)",
         cardDark: "0 1px 3px 0 rgba(0,0,0,0.4), 0 1px 2px -1px rgba(0,0,0,0.3)",
-        glow: "0 0 0 1px rgba(22,163,74,0.08), 0 8px 24px -8px rgba(22,163,74,0.25)",
+        glow: "0 0 0 1px rgba(184,134,11,0.12), 0 8px 24px -8px rgba(184,134,11,0.3)",
+        lift: "0 20px 60px rgba(26,23,20,0.08)",
       },
       backgroundImage: {
         grain:
-          "radial-gradient(circle at 1px 1px, rgba(0,0,0,0.035) 1px, transparent 0)",
+          "radial-gradient(circle at 1px 1px, rgba(26,23,20,0.035) 1px, transparent 0)",
       },
     },
   },
