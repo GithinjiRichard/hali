@@ -17,6 +17,7 @@ import type {
   PerspectiveItem,
   PerspectiveKey,
   YearPoint,
+  HistoricalEvent,
 } from "./types";
 
 // ---------------------------------------------------------------------------
