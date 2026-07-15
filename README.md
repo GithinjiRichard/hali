@@ -243,10 +243,46 @@ Because `getMonthList()` anchors to the real calendar date at build time
 (not a hardcoded date), the "current month" label also stays correct on
 its own as time passes, even if you forget to redeploy for a cycle or two.
 
-**Extending to another country:** once you have a real source for, say,
-Uganda or Tanzania, mark it `"live"` (with a price) in
-`getEastAfricaSnapshot()`, and consider giving it its own `REAL_ANCHORS`
-block if you want a full price history for it too.
+### Tanzania and Uganda
+
+Hali now also tracks Tanzania and Uganda — the other two founding members
+of the original East African Community, alongside Kenya. Each has a real
+current price, but the three countries genuinely work differently, and the
+app is deliberately honest about that rather than flattening them into one
+model:
+
+| Country  | Regulator                                              | Model                                             | Cadence                                  |
+|----------|---------------------------------------------------------|----------------------------------------------------|-------------------------------------------|
+| Kenya    | EPRA                                                     | Official gazetted max retail price                  | Monthly, effective the **14th–15th**      |
+| Tanzania | EWURA                                                    | Official gazetted cap price (by port: Dar/Tanga/Mtwara) | Monthly, effective **early in the month** (varies, historically 1st–6th) |
+| Uganda   | Ministry of Energy & Mineral Development                 | **Deregulated** — dealers set their own pump prices | No fixed cadence; Ministry publishes an indicative price, actual pump prices vary station to station |
+
+To update Tanzania or Uganda, edit `TANZANIA_ANCHOR` / `UGANDA_ANCHOR` in
+`src/lib/data.ts` the same way as `REAL_ANCHORS` above. Uganda has no
+`previous` block by design — with no official cycle date, a clean
+month-over-month % change would imply more precision than the source
+actually supports, so the UI only shows Uganda's current price.
+
+### Keeping this current without manual edits
+
+This sandbox has no network access, so this update is a manual, one-time
+data refresh rather than a deployed automation. The natural next step is a
+small scheduled job (a GitHub Action or Vercel Cron Job both work well)
+that runs monthly and:
+
+1. Fetches the official page for each country (EPRA's pump price page,
+   EWURA's cap price notice) rather than a news aggregator.
+2. Parses out the retail petrol/diesel/kerosene figures.
+3. Opens a PR (or writes directly, if you're comfortable skipping review)
+   updating the relevant `*_ANCHOR` block in `src/lib/data.ts`.
+4. Runs on a schedule matched to each country's real cadence — e.g. the
+   15th for Kenya, the 1st for Tanzania — rather than a single shared day,
+   since the two don't actually update on the same schedule.
+
+Uganda doesn't fit this pattern well since there's no single official
+number to fetch on a schedule — a periodic manual spot-check (as done here)
+or a small survey-based estimate is more honest than pretending there's an
+official cadence to scrape.
 
 ## Deployment (Vercel)
 

@@ -11,6 +11,7 @@ import type {
   BudgetShare,
   PerspectiveItem,
   PerspectiveKey,
+  HistoricalEvent,
 } from "@/lib/types";
 import type { CountrySnapshot } from "@/lib/data";
 import Hero from "./Hero";
@@ -28,6 +29,7 @@ export default function LandingClient({
   prices,
   history,
   sinceIndependence,
+  historicalEvents,
   details,
   stories,
   countries,
@@ -37,6 +39,7 @@ export default function LandingClient({
   prices: CurrentPrice[];
   history: HistoryPoint[];
   sinceIndependence: YearPoint[];
+  historicalEvents: HistoricalEvent[];
   details: Record<CommoditySlug, CommodityDetail>;
   stories: Story[];
   countries: CountrySnapshot[];
@@ -76,6 +79,7 @@ export default function LandingClient({
         prices={prices}
         history={history}
         sinceIndependence={sinceIndependence}
+        events={historicalEvents}
         details={details}
         selected={selected}
         onSelect={setSelected}

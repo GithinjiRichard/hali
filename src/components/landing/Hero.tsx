@@ -47,10 +47,11 @@ export default function Hero({
             ?
           </h1>
           <p className="text-lg text-muted dark:text-mutedDark leading-relaxed mb-8 max-w-xl">
-            Hali tracks Super Petrol, Diesel, and Kerosene prices in Kenya
-            today, expanding across East Africa next, and explains what&apos;s
-            behind every change — no economics degree required. Today&apos;s
-            Super Petrol price in Kenya:{" "}
+            Hali now tracks Super Petrol, Diesel, and Kerosene prices in
+            Kenya, Tanzania, and Uganda — with Kenya&apos;s full price
+            history live below — and explains what&apos;s behind every
+            change, no economics degree required. Today&apos;s Super Petrol
+            price in Kenya:{" "}
             <span className="font-mono-data font-semibold text-ink dark:text-inkDark">
               KES {petrol.currentPrice.toFixed(2)}
             </span>{" "}

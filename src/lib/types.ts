@@ -106,6 +106,12 @@ export interface PerspectiveItem {
 
 export type PerspectiveKey = "citizen" | "business" | "government";
 
+export interface HistoricalEvent {
+  year: number;
+  title: string;
+  description: string;
+}
+
 export interface YearPoint {
   year: number;
   price: number;

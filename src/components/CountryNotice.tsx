@@ -12,11 +12,12 @@ export default function CountryNotice() {
       <div className="mx-auto max-w-6xl px-5 py-2 flex items-center gap-3 text-xs">
         <MapPin size={13} className="text-accentDark shrink-0" />
         <p className="flex-1">
-          <span className="font-semibold">🇰🇪 Showing Kenya today.</span>{" "}
+          <span className="font-semibold">
+            🇰🇪🇹🇿🇺🇬 Now live: Kenya, Tanzania &amp; Uganda.
+          </span>{" "}
           <span className="text-[#B8AFA1] dark:text-mutedDark">
-            Live tracking for Uganda, Tanzania, Rwanda and the rest of East
-            Africa is coming soon — see where each country stands in the map
-            below.
+            Rwanda, Burundi and the rest of East Africa are coming soon —
+            see where each country stands in the map below.
           </span>
         </p>
         <button
