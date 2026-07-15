@@ -48,8 +48,8 @@ export default function Hero({
           </h1>
           <p className="text-lg text-muted dark:text-mutedDark leading-relaxed mb-8 max-w-xl">
             Hali tracks Super Petrol, Diesel, and Kerosene prices across East
-            Africa and explains what's behind every change — no economics
-            degree required. Today's Super Petrol price in Kenya:{" "}
+            Africa and explains what&apos;s behind every change — no economics
+            degree required. Today&apos;s Super Petrol price in Kenya:{" "}
             <span className="font-mono-data font-semibold text-ink dark:text-inkDark">
               KES {petrol.currentPrice.toFixed(2)}
             </span>{" "}
