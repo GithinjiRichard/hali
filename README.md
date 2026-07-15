@@ -27,9 +27,9 @@ Built with **Next.js 15**, **React 19**, **TypeScript**, **Tailwind CSS**, and *
 | Data        | In-memory, deterministic mock data (`src/lib/data.ts`) — no database setup required |
 | Charts      | Recharts                                      |
 | Icons       | lucide-react                                  |
-| Fonts       | Inter (body/UI), Fraunces (editorial headings), JetBrains Mono (numbers) — loaded via `next/font/google` |
+| Fonts       | Inter (body/UI), Playfair Display (editorial headings), JetBrains Mono (numbers) — loaded via `next/font/google` |
 
-> **Note on fonts:** Anthropic's in-house typeface used across Claude's own products isn't publicly licensed, so it can't be reused here. Instead, Hali pairs **Fraunces** (a warm, humanist serif) for headlines with **Inter** for UI text and **JetBrains Mono** for figures — a similar "editorial headline + clean data" feel, using free Google Fonts.
+> **Note on fonts:** Anthropic's in-house typeface used across Claude's own products isn't publicly licensed, so it can't be reused here. Instead, Hali pairs **Playfair Display** (an editorial serif) for headlines with **Inter** for UI text and **JetBrains Mono** for figures — a similar "editorial headline + clean data" feel, using free Google Fonts.
 
 ## Project Structure
 
@@ -113,6 +113,21 @@ Open [http://localhost:3000](http://localhost:3000) in your browser. That's it �
 | `npm run start`    | Start the production server (after build)     |
 | `npm run lint`     | Run ESLint                                     |
 
+### Troubleshooting install warnings
+
+- **"No lockfile found"** — this happens the very first time anyone installs
+  (no `package-lock.json`/`yarn.lock` has been committed yet). Run
+  `npm install` once and commit the `package-lock.json` it generates; the
+  warning won't reappear after that. If your team uses Yarn instead, run
+  `yarn install` and commit `yarn.lock` — just pick one package manager and
+  commit its lockfile, not both.
+- **ESLint / recharts deprecation warnings** — ESLint has been upgraded to
+  v9 with the modern flat config (`eslint.config.mjs`) to clear the "no
+  longer supported" warning and its outdated sub-dependencies. Recharts is
+  intentionally staying on 2.x for now — the 3.x migration is a breaking
+  change not worth the risk this early; it's a fine candidate for a later,
+  dedicated upgrade PR.
+
 ## API Reference
 
 All endpoints return JSON.
@@ -192,6 +207,47 @@ AI-style market insights, most recent first.
 }
 ```
 
+## Updating Fuel Prices
+
+Kenya's current and previous-month Super Petrol, Diesel, and Kerosene prices
+are **real**, sourced from EPRA's public monthly pump price circular
+(published around the 14th–15th of each month at
+[epra.go.ke/pump-prices](https://www.epra.go.ke/pump-prices), and widely
+reported by Kenyan outlets the same day). Everything else in the 24-month
+chart is an illustrative trend shape, mathematically anchored so it always
+ends exactly on those two real numbers — see the `calibrateToReal()`
+comment in `src/lib/data.ts` if you want the mechanics.
+
+**To update prices for a new EPRA cycle**, open `src/lib/data.ts` and find
+the `REAL_ANCHORS` block near the top:
+
+```ts
+const REAL_ANCHORS = {
+  effectiveFrom: "2026-07-15",
+  effectiveTo: "2026-08-14",
+  sourceUrl: "https://www.epra.go.ke/pump-prices",
+  current:  { petrol: 214.03, diesel: 222.86, kerosene: 191.38 },
+  previous: { petrol: 214.25, diesel: 232.86, kerosene: 191.38 },
+};
+```
+
+1. Move the current cycle's numbers into `previous`.
+2. Enter the new cycle's numbers (Nairobi, KES/litre) into `current`.
+3. Update `effectiveFrom` / `effectiveTo` to the new cycle's dates.
+4. Save, commit, and redeploy (`git push`, or `npm run build && npm run
+   start` locally). The current price, % change, "last updated" date, the
+   24-month chart, and the dashboard high/low all update automatically —
+   nothing else needs to change.
+
+Because `getMonthList()` anchors to the real calendar date at build time
+(not a hardcoded date), the "current month" label also stays correct on
+its own as time passes, even if you forget to redeploy for a cycle or two.
+
+**Extending to another country:** once you have a real source for, say,
+Uganda or Tanzania, mark it `"live"` (with a price) in
+`getEastAfricaSnapshot()`, and consider giving it its own `REAL_ANCHORS`
+block if you want a full price history for it too.
+
 ## Deployment (Vercel)
 
 This project is ready for direct deployment to Vercel with zero configuration:
@@ -210,4 +266,4 @@ This project is ready for direct deployment to Vercel with zero configuration:
 
 ## License
 
-This is an MVP/demo project provided as-is for evaluation and prototyping purposes. All price data is mock/sample data and does not reflect real EPRA pricing.
+This is an MVP/demo project provided as-is for evaluation and prototyping purposes. Kenya's current and previous-month fuel prices are sourced from EPRA's public pump price circular (see "Updating Fuel Prices" above); the rest of the 24-month trend, the independence-era history, and all non-Kenya figures are illustrative estimates, not audited data.

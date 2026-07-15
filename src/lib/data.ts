@@ -23,6 +23,51 @@ import type {
 // Deterministic price series (mirrors scripts/seed.js exactly)
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// REAL PRICE ANCHORS — the only numbers in this file that are meant to be
+// genuinely real rather than illustrative. Update this block every time
+// EPRA publishes a new monthly pump price circular (mid-month, at
+// https://www.epra.go.ke/pump-prices). See README.md → "Updating fuel
+// prices" for the full step-by-step.
+//
+// Verified against EPRA's July 15 – August 14, 2026 circular (Nairobi):
+// Super Petrol KES 214.03, Diesel KES 222.86, Kerosene KES 191.38 — unchanged
+// from the previous cycle except Petrol (-0.22) and Diesel (-10.00).
+// ---------------------------------------------------------------------------
+const REAL_ANCHORS = {
+  effectiveFrom: "2026-07-15",
+  effectiveTo: "2026-08-14",
+  sourceUrl: "https://www.epra.go.ke/pump-prices",
+  // This cycle (Nairobi, KES/litre)
+  current: { petrol: 214.03, diesel: 222.86, kerosene: 191.38 },
+  // Previous cycle, for the month-over-month % change
+  previous: { petrol: 214.25, diesel: 232.86, kerosene: 191.38 },
+};
+
+/**
+ * Rescales a generated mock series so its final two points land exactly on
+ * the real current/previous anchors, while preserving the *relative*
+ * month-over-month shape (percentage moves) of the illustrative trend
+ * leading up to them. Working in ratios rather than absolute deltas means
+ * this can't invert or blow up the historical trend even when the raw
+ * mock series happened to move the "wrong" way in its last step — only
+ * the two real anchor points are ever asserted as literally true; the
+ * rest stays an illustrative-but-stable shape. Updating REAL_ANCHORS above
+ * is enough to keep the whole chart, the highs/lows, and the % change all
+ * consistent — nothing else needs editing.
+ */
+function calibrateToReal(raw: number[], realCurrent: number, realPrevious: number): number[] {
+  const last = raw.length - 1;
+  const calibrated = new Array<number>(raw.length);
+  calibrated[last] = realCurrent;
+  calibrated[last - 1] = realPrevious;
+  for (let i = last - 2; i >= 0; i--) {
+    const ratio = raw[i + 1] / raw[i];
+    calibrated[i] = calibrated[i + 1] / ratio;
+  }
+  return calibrated.map((v) => Math.round(v * 100) / 100);
+}
+
 function seededRandom(seed: number) {
   let s = seed;
   return function () {
@@ -33,7 +78,7 @@ function seededRandom(seed: number) {
 
 function getMonthList(monthsBack: number): string[] {
   const months: string[] = [];
-  const now = new Date(2026, 5, 1); // June 2026
+  const now = new Date(); // real "today" — advances automatically on every rebuild
   for (let i = monthsBack - 1; i >= 0; i--) {
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
     const y = d.getFullYear();
@@ -67,9 +112,21 @@ function generateSeries(base: number, volatility: number): number[] {
 }
 
 const series = {
-  petrol: generateSeries(basePrices.petrol, 2.0),
-  diesel: generateSeries(basePrices.diesel, 1.8),
-  kerosene: generateSeries(basePrices.kerosene, 2.2),
+  petrol: calibrateToReal(
+    generateSeries(basePrices.petrol, 2.0),
+    REAL_ANCHORS.current.petrol,
+    REAL_ANCHORS.previous.petrol
+  ),
+  diesel: calibrateToReal(
+    generateSeries(basePrices.diesel, 1.8),
+    REAL_ANCHORS.current.diesel,
+    REAL_ANCHORS.previous.diesel
+  ),
+  kerosene: calibrateToReal(
+    generateSeries(basePrices.kerosene, 2.2),
+    REAL_ANCHORS.current.kerosene,
+    REAL_ANCHORS.previous.kerosene
+  ),
 };
 
 // ---------------------------------------------------------------------------
@@ -98,7 +155,7 @@ export function getCurrentPrices(): CurrentPrice[] {
       previousPrice: previous,
       percentChange,
       lastUpdated: MONTHS[last],
-      sourceLabel: "EPRA monthly pump price circular (Kenya)",
+      sourceLabel: `EPRA pump price circular, ${REAL_ANCHORS.effectiveFrom} to ${REAL_ANCHORS.effectiveTo}`,
     };
   });
 }
