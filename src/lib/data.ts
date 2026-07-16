@@ -18,6 +18,7 @@ import type {
   PerspectiveKey,
   YearPoint,
   HistoricalEvent,
+  PriceEvent,
 } from "./types";
 
 // ---------------------------------------------------------------------------
@@ -25,47 +26,95 @@ import type {
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
-// REAL PRICE ANCHORS — the only numbers in this file that are meant to be
-// genuinely real rather than illustrative. Update this block every time
-// EPRA publishes a new monthly pump price circular (mid-month, at
-// https://www.epra.go.ke/pump-prices). See README.md → "Updating fuel
-// prices" for the full step-by-step.
+// REAL MONTHLY PRICES — genuine, sourced EPRA pump-price-circular figures for
+// Nairobi (KES/litre), keyed by the "bucket" month they fall in (see
+// getMonthList below). These are the only numbers in this file meant to be
+// literally real; everything else is an illustrative mock shape that gets
+// calibrated to pass through these exact points. Update this table whenever
+// EPRA publishes a new circular — see README → "Updating Fuel Prices".
 //
-// Verified against EPRA's July 15 – August 14, 2026 circular (Nairobi):
-// Super Petrol KES 214.03, Diesel KES 222.86, Kerosene KES 191.38 — unchanged
-// from the previous cycle except Petrol (-0.22) and Diesel (-10.00).
+// A correction from an earlier pass: the June 2026 cycle (Jun 15–Jul 14) was
+// genuinely IDENTICAL to July's (214.03 / 222.86 / 191.38) — EPRA's July 14
+// announcement was "unchanged," not a fresh cut. The -0.22 / -10.00 move
+// I'd previously attributed to "last month" actually happened one cycle
+// earlier, going from May's cycle into June's. Fixed below.
 // ---------------------------------------------------------------------------
+const REAL_MONTHLY_PRICES: Record<string, { petrol: number; diesel: number; kerosene: number }> = {
+  "2025-07-01": { petrol: 186.31, diesel: 171.58, kerosene: 156.58 },
+  "2025-08-01": { petrol: 185.31, diesel: 171.58, kerosene: 155.58 },
+  "2025-09-01": { petrol: 184.52, diesel: 171.47, kerosene: 154.78 },
+  "2025-10-01": { petrol: 184.52, diesel: 171.47, kerosene: 154.78 },
+  // 2026-03 is derived (not directly reported): backed out from the
+  // confirmed +28.69/+40.30 jump reported for the April cycle's initial
+  // announcement. Least certain figure in this table.
+  "2026-03-01": { petrol: 178.28, diesel: 166.54, kerosene: 152.78 },
+  "2026-04-01": { petrol: 197.6, diesel: 196.63, kerosene: 152.78 },
+  "2026-05-01": { petrol: 214.25, diesel: 232.86, kerosene: 191.38 },
+  "2026-06-01": { petrol: 214.03, diesel: 222.86, kerosene: 191.38 },
+  "2026-07-01": { petrol: 214.03, diesel: 222.86, kerosene: 191.38 },
+};
+
 const REAL_ANCHORS = {
   effectiveFrom: "2026-07-15",
   effectiveTo: "2026-08-14",
   sourceUrl: "https://www.epra.go.ke/pump-prices",
-  // This cycle (Nairobi, KES/litre)
-  current: { petrol: 214.03, diesel: 222.86, kerosene: 191.38 },
-  // Previous cycle, for the month-over-month % change
-  previous: { petrol: 214.25, diesel: 232.86, kerosene: 191.38 },
+  // This cycle (Nairobi, KES/litre) — genuinely unchanged from last cycle.
+  current: REAL_MONTHLY_PRICES["2026-07-01"],
+  previous: REAL_MONTHLY_PRICES["2026-06-01"],
 };
 
 /**
- * Rescales a generated mock series so its final two points land exactly on
- * the real current/previous anchors, while preserving the *relative*
- * month-over-month shape (percentage moves) of the illustrative trend
- * leading up to them. Working in ratios rather than absolute deltas means
- * this can't invert or blow up the historical trend even when the raw
- * mock series happened to move the "wrong" way in its last step — only
- * the two real anchor points are ever asserted as literally true; the
- * rest stays an illustrative-but-stable shape. Updating REAL_ANCHORS above
- * is enough to keep the whole chart, the highs/lows, and the % change all
- * consistent — nothing else needs editing.
+ * Rescales a generated mock series so it passes exactly through every known
+ * real month in `realByMonth`, while preserving the *relative*
+ * month-over-month shape of the illustrative trend everywhere else.
+ * Between two known real months, the correction needed to bridge them is
+ * spread evenly (geometrically) across each step in between, so no single
+ * step gets distorted — safer than a single end-to-end rescale when there
+ * are several real anchors scattered through the series rather than just
+ * two at the very end.
  */
-function calibrateToReal(raw: number[], realCurrent: number, realPrevious: number): number[] {
-  const last = raw.length - 1;
-  const calibrated = new Array<number>(raw.length);
-  calibrated[last] = realCurrent;
-  calibrated[last - 1] = realPrevious;
-  for (let i = last - 2; i >= 0; i--) {
+function calibrateToReal(
+  raw: number[],
+  months: string[],
+  realByMonth: Record<string, { petrol: number; diesel: number; kerosene: number }>,
+  commodity: "petrol" | "diesel" | "kerosene"
+): number[] {
+  const calibrated = [...raw];
+  const knownIdx = months
+    .map((m, i) => (realByMonth[m] ? i : -1))
+    .filter((i) => i >= 0);
+  if (knownIdx.length === 0) return calibrated.map((v) => Math.round(v * 100) / 100);
+
+  // Anchor every known month directly.
+  for (const i of knownIdx) calibrated[i] = realByMonth[months[i]][commodity];
+
+  // Fill between each consecutive pair of known anchors.
+  for (let k = 0; k < knownIdx.length - 1; k++) {
+    const left = knownIdx[k];
+    const right = knownIdx[k + 1];
+    if (right - left < 2) continue; // adjacent months, nothing to fill
+    const rawTotalRatio = raw[right] / raw[left];
+    const targetTotalRatio = calibrated[right] / calibrated[left];
+    const perStepAdjustment = Math.pow(targetTotalRatio / rawTotalRatio, 1 / (right - left));
+    for (let i = left + 1; i < right; i++) {
+      const rawStepRatio = raw[i] / raw[i - 1];
+      calibrated[i] = calibrated[i - 1] * rawStepRatio * perStepAdjustment;
+    }
+  }
+
+  // Fill before the first known anchor and after the last, chaining raw's
+  // own ratios outward (no target to bridge to, so no adjustment needed).
+  const first = knownIdx[0];
+  for (let i = first - 1; i >= 0; i--) {
     const ratio = raw[i + 1] / raw[i];
     calibrated[i] = calibrated[i + 1] / ratio;
   }
+  const lastKnown = knownIdx[knownIdx.length - 1];
+  for (let i = lastKnown + 1; i < calibrated.length; i++) {
+    const ratio = raw[i] / raw[i - 1];
+    calibrated[i] = calibrated[i - 1] * ratio;
+  }
+
   return calibrated.map((v) => Math.round(v * 100) / 100);
 }
 
@@ -115,18 +164,21 @@ function generateSeries(base: number, volatility: number): number[] {
 const series = {
   petrol: calibrateToReal(
     generateSeries(basePrices.petrol, 2.0),
-    REAL_ANCHORS.current.petrol,
-    REAL_ANCHORS.previous.petrol
+    MONTHS,
+    REAL_MONTHLY_PRICES,
+    "petrol"
   ),
   diesel: calibrateToReal(
     generateSeries(basePrices.diesel, 1.8),
-    REAL_ANCHORS.current.diesel,
-    REAL_ANCHORS.previous.diesel
+    MONTHS,
+    REAL_MONTHLY_PRICES,
+    "diesel"
   ),
   kerosene: calibrateToReal(
     generateSeries(basePrices.kerosene, 2.2),
-    REAL_ANCHORS.current.kerosene,
-    REAL_ANCHORS.previous.kerosene
+    MONTHS,
+    REAL_MONTHLY_PRICES,
+    "kerosene"
   ),
 };
 
@@ -168,6 +220,60 @@ export function getPriceHistory(): HistoryPoint[] {
     diesel: series.diesel[i],
     kerosene: series.kerosene[i],
   }));
+}
+
+// ---------------------------------------------------------------------------
+// Price Events — real, dated events behind the moves in the recent 24-month
+// chart on /trends. Unlike getHistoricalEvents() (which covers 1963–today
+// for the landing page's independence-era view), these are specific to
+// this shorter, recent window and sourced directly from EPRA's own monthly
+// announcements and contemporaneous Kenyan news coverage — not mock.
+// ---------------------------------------------------------------------------
+export function getPriceEvents(): PriceEvent[] {
+  return [
+    {
+      period_date: "2025-07-01",
+      title: "Pump prices jump on rising global oil costs",
+      description:
+        "EPRA raised prices by a 9-shilling average as the landed cost of imported fuel rose 6–7% month-on-month, driven by renewed Middle East tension pushing global crude higher.",
+      direction: "up",
+    },
+    {
+      period_date: "2025-09-01",
+      title: "Prices ease to a two-year low",
+      description:
+        "EPRA cut Super Petrol, Diesel, and Kerosene together as landed costs softened — pushing pump prices to their lowest level in over two years at the time.",
+      direction: "down",
+    },
+    {
+      period_date: "2026-04-01",
+      title: "Two price changes in 24 hours",
+      description:
+        "EPRA's scheduled review pushed petrol and diesel to record highs, prompting Gen-Z-led backlash echoing the 2024 Finance Bill protests. Within a day, President Ruto cut VAT on fuel from 16% to 8%, forcing a same-day price reversal — the most volatile single cycle in Hali's tracked history.",
+      direction: "mixed",
+    },
+    {
+      period_date: "2026-05-01",
+      title: "Diesel spikes, then a rare mid-cycle correction",
+      description:
+        "A 20%+ jump in landed diesel costs — linked to the US-Israel-Iran conflict — drove the sharpest diesel increase on record. Mid-cycle, EPRA took the unusual step of narrowing the diesel-kerosene price gap after transport operators warned it was encouraging diesel adulteration.",
+      direction: "up",
+    },
+    {
+      period_date: "2026-06-01",
+      title: "Relief, cushioned by a record subsidy",
+      description:
+        "Prices eased modestly, helped by a record KES 34.07/litre diesel subsidy from the Petroleum Development Levy Fund as the government worked to contain public anger over living costs.",
+      direction: "down",
+    },
+    {
+      period_date: "2026-07-01",
+      title: "Held flat for a second straight month",
+      description:
+        "EPRA kept prices unchanged, extending the 8% VAT rate for three more months and drawing on the Petroleum Development Levy Fund to shield consumers from renewed Middle East volatility.",
+      direction: "flat",
+    },
+  ];
 }
 
 export function getDashboardStats(): DashboardStats {

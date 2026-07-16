@@ -11,7 +11,7 @@ import {
   Tooltip,
   ReferenceDot,
 } from "recharts";
-import { ArrowUp, ArrowDown, Fuel, CalendarClock } from "lucide-react";
+import { ArrowUp, ArrowDown, Fuel, CalendarClock, Minus } from "lucide-react";
 import type {
   CurrentPrice,
   HistoryPoint,
@@ -174,17 +174,23 @@ export default function ExploreSection({
                 </div>
                 <div
                   className={`text-sm font-semibold inline-flex items-center gap-1 justify-end w-full ${
-                    current.percentChange >= 0
+                    current.percentChange === 0
+                      ? "text-muted dark:text-mutedDark"
+                      : current.percentChange > 0
                       ? "text-danger dark:text-dangerDark"
                       : "text-primary dark:text-primaryDark"
                   }`}
                 >
-                  {current.percentChange >= 0 ? (
+                  {current.percentChange === 0 ? (
+                    <Minus size={13} />
+                  ) : current.percentChange > 0 ? (
                     <ArrowUp size={13} />
                   ) : (
                     <ArrowDown size={13} />
                   )}
-                  {Math.abs(current.percentChange).toFixed(2)}%
+                  {current.percentChange === 0
+                    ? "Unchanged"
+                    : `${Math.abs(current.percentChange).toFixed(2)}%`}
                 </div>
               </div>
             </div>

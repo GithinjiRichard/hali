@@ -209,39 +209,58 @@ AI-style market insights, most recent first.
 
 ## Updating Fuel Prices
 
-Kenya's current and previous-month Super Petrol, Diesel, and Kerosene prices
-are **real**, sourced from EPRA's public monthly pump price circular
-(published around the 14th–15th of each month at
+Kenya's Super Petrol, Diesel, and Kerosene prices for several recent months
+are **real**, sourced directly from EPRA's public monthly pump price
+circular (published around the 14th–15th of each month at
 [epra.go.ke/pump-prices](https://www.epra.go.ke/pump-prices), and widely
-reported by Kenyan outlets the same day). Everything else in the 24-month
-chart is an illustrative trend shape, mathematically anchored so it always
-ends exactly on those two real numbers — see the `calibrateToReal()`
-comment in `src/lib/data.ts` if you want the mechanics.
+reported by Kenyan outlets the same day) — not just the current and
+previous cycle, but nine confirmed months scattered across the 24-month
+chart. Every month in between two confirmed real points is an illustrative
+trend shape, mathematically calibrated to pass exactly through the real
+numbers on either side — see the `calibrateToReal()` comment in
+`src/lib/data.ts` if you want the mechanics.
 
 **To update prices for a new EPRA cycle**, open `src/lib/data.ts` and find
-the `REAL_ANCHORS` block near the top:
+the `REAL_MONTHLY_PRICES` table near the top:
 
 ```ts
-const REAL_ANCHORS = {
-  effectiveFrom: "2026-07-15",
-  effectiveTo: "2026-08-14",
-  sourceUrl: "https://www.epra.go.ke/pump-prices",
-  current:  { petrol: 214.03, diesel: 222.86, kerosene: 191.38 },
-  previous: { petrol: 214.25, diesel: 232.86, kerosene: 191.38 },
+const REAL_MONTHLY_PRICES: Record<string, { petrol: number; diesel: number; kerosene: number }> = {
+  "2025-07-01": { petrol: 186.31, diesel: 171.58, kerosene: 156.58 },
+  // ...
+  "2026-06-01": { petrol: 214.03, diesel: 222.86, kerosene: 191.38 },
+  "2026-07-01": { petrol: 214.03, diesel: 222.86, kerosene: 191.38 },
 };
 ```
 
-1. Move the current cycle's numbers into `previous`.
-2. Enter the new cycle's numbers (Nairobi, KES/litre) into `current`.
-3. Update `effectiveFrom` / `effectiveTo` to the new cycle's dates.
-4. Save, commit, and redeploy (`git push`, or `npm run build && npm run
+1. Add a new entry keyed to the new cycle's month (`"YYYY-MM-01"`, matching
+   the month the cycle *starts* in — e.g. a cycle starting July 15 is
+   keyed `"2026-07-01"`).
+2. Update `REAL_ANCHORS.effectiveFrom` / `effectiveTo` to the new cycle's
+   dates (this just drives the "last updated" label and source caption).
+3. Save, commit, and redeploy (`git push`, or `npm run build && npm run
    start` locally). The current price, % change, "last updated" date, the
-   24-month chart, and the dashboard high/low all update automatically —
-   nothing else needs to change.
+   24-month chart, the dashboard high/low, and the `/trends` calendar all
+   update automatically — nothing else needs to change.
+
+A note on accuracy: an earlier pass of this table mistakenly attributed a
+price cut to the wrong cycle (labeling June as a fresh reduction, when
+EPRA's own July 14 announcement was genuinely "unchanged" from June — the
+real cut happened one cycle earlier, going from May into June). If a
+month's % change ever looks surprising, it's worth checking the actual
+EPRA circular for that exact cycle rather than assuming the app is right —
+the goal here is to stay correctable, not to appear authoritative.
 
 Because `getMonthList()` anchors to the real calendar date at build time
 (not a hardcoded date), the "current month" label also stays correct on
 its own as time passes, even if you forget to redeploy for a cycle or two.
+
+**Price events** shown on `/trends` (the highlighted months with a story
+behind them) live in `getPriceEvents()`, right below `getPriceHistory()`
+in the same file. Add an entry there — `{ period_date, title, description,
+direction }` — whenever a cycle has a real, citable story worth
+surfacing (a sharp spike, a subsidy, a policy change), the same way the six
+currently there were sourced from actual EPRA announcements and news
+coverage, not invented.
 
 ### Tanzania and Uganda
 
