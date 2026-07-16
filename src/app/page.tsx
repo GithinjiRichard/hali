@@ -7,6 +7,7 @@ import {
   getBudgetShare,
   getPerspectives,
   getSinceIndependenceSeries,
+  getHistoricalEvents,
 } from "@/lib/data";
 import type { CommoditySlug, CommodityDetail } from "@/lib/types";
 import LandingClient from "@/components/landing/LandingClient";
@@ -19,6 +20,7 @@ export default function HomePage() {
   const budgetShare = getBudgetShare();
   const perspectives = getPerspectives();
   const sinceIndependence = getSinceIndependenceSeries();
+  const historicalEvents = getHistoricalEvents();
 
   const slugs: CommoditySlug[] = ["petrol", "diesel", "kerosene"];
   const details = slugs.reduce((acc, slug) => {
@@ -31,6 +33,7 @@ export default function HomePage() {
       prices={prices}
       history={history}
       sinceIndependence={sinceIndependence}
+      historicalEvents={historicalEvents}
       details={details}
       stories={stories}
       countries={countries}

@@ -96,6 +96,52 @@ body {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
+.year-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 3px;
+  background: #e8e4dc;
+  cursor: pointer;
+}
+.dark .year-slider {
+  background: #3a332a;
+}
+.year-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: currentColor;
+  border: 2px solid #faf8f4;
+  box-shadow: 0 1px 3px rgba(26, 23, 20, 0.3);
+  cursor: pointer;
+}
+.dark .year-slider::-webkit-slider-thumb {
+  border-color: #17140f;
+}
+.year-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: currentColor;
+  border: 2px solid #faf8f4;
+  box-shadow: 0 1px 3px rgba(26, 23, 20, 0.3);
+  cursor: pointer;
+}
+.dark .year-slider::-moz-range-thumb {
+  border-color: #17140f;
+}
+.year-slider::-moz-range-track {
+  height: 6px;
+  border-radius: 3px;
+  background: #e8e4dc;
+}
+.dark .year-slider::-moz-range-track {
+  background: #3a332a;
+}
+
 .accent-line {
   width: 44px;
   height: 3px;

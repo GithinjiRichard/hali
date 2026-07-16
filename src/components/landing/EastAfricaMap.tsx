@@ -43,7 +43,9 @@ export default function EastAfricaMap({
         const color = c.status === "live" ? "#1B7A3D" : "#B8860B";
         const label =
           c.status === "live"
-            ? `${c.name}: ${c.currency} ${c.petrolPrice?.toFixed(2)} per litre — live`
+            ? `${c.name}: ${c.currency} ${c.petrolPrice?.toFixed(2)}/litre${
+                c.priceModel === "deregulated" ? " (indicative, dealer prices vary)" : " — live"
+              }`
             : `${c.name}: coming soon`;
         return (
           <button

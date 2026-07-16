@@ -106,6 +106,19 @@ export interface PerspectiveItem {
 
 export type PerspectiveKey = "citizen" | "business" | "government";
 
+export interface PriceEvent {
+  period_date: string;
+  title: string;
+  description: string;
+  direction: "up" | "down" | "mixed" | "flat";
+}
+
+export interface HistoricalEvent {
+  year: number;
+  title: string;
+  description: string;
+}
+
 export interface YearPoint {
   year: number;
   price: number;

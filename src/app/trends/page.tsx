@@ -1,10 +1,11 @@
-import { getPriceHistory } from "@/lib/data";
+import { getPriceHistory, getPriceEvents } from "@/lib/data";
 import TrendsClient from "./TrendsClient";
 
 export const dynamic = "force-dynamic";
 
 export default function TrendsPage() {
   const history = getPriceHistory();
+  const events = getPriceEvents();
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
@@ -19,7 +20,7 @@ export default function TrendsPage() {
         </p>
       </div>
 
-      <TrendsClient data={history} />
+      <TrendsClient data={history} events={events} />
     </div>
     </div>
   );

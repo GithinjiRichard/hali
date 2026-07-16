@@ -4,7 +4,8 @@ import { useState } from "react";
 import clsx from "clsx";
 import PriceTrendChart from "@/components/PriceTrendChart";
 import PercentChangeChart from "@/components/PercentChangeChart";
-import type { HistoryPoint } from "@/lib/types";
+import PriceEventsCalendar from "@/components/PriceEventsCalendar";
+import type { HistoryPoint, PriceEvent } from "@/lib/types";
 
 const COMMODITIES = [
   { key: "petrol" as const, label: "Super Petrol", color: "#B8860B" },
@@ -12,7 +13,7 @@ const COMMODITIES = [
   { key: "kerosene" as const, label: "Kerosene", color: "#4A6670" },
 ];
 
-export default function TrendsClient({ data }: { data: HistoryPoint[] }) {
+export default function TrendsClient({ data, events }: { data: HistoryPoint[]; events: PriceEvent[] }) {
   const [active, setActive] = useState<Set<string>>(
     new Set(["petrol", "diesel", "kerosene"])
   );
@@ -80,51 +81,8 @@ export default function TrendsClient({ data }: { data: HistoryPoint[] }) {
         ))}
       </section>
 
-      {/* Data table */}
-      <section className="rounded-xl border border-border dark:border-borderDark bg-surface dark:bg-surfaceDark p-5 shadow-card dark:shadow-cardDark overflow-x-auto">
-        <h2 className="font-semibold text-ink dark:text-inkDark mb-4">
-          Monthly Price History (Nairobi)
-        </h2>
-        <table className="w-full text-sm font-mono-data">
-          <thead>
-            <tr className="text-left text-muted dark:text-mutedDark border-b border-border dark:border-borderDark">
-              <th className="py-2 pr-4 font-medium">Month</th>
-              <th className="py-2 pr-4 font-medium text-right">
-                Super Petrol
-              </th>
-              <th className="py-2 pr-4 font-medium text-right">Diesel</th>
-              <th className="py-2 pr-4 font-medium text-right">Kerosene</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data
-              .slice()
-              .reverse()
-              .map((row) => (
-                <tr
-                  key={row.period_date}
-                  className="border-b border-border/60 dark:border-borderDark/60 hover:bg-surfaceLight dark:hover:bg-surfaceLightDark"
-                >
-                  <td className="py-2 pr-4 text-muted dark:text-mutedDark">
-                    {new Date(row.period_date).toLocaleDateString("en-KE", {
-                      month: "short",
-                      year: "numeric",
-                    })}
-                  </td>
-                  <td className="py-2 pr-4 text-right text-ink dark:text-inkDark">
-                    {row.petrol.toFixed(2)}
-                  </td>
-                  <td className="py-2 pr-4 text-right text-ink dark:text-inkDark">
-                    {row.diesel.toFixed(2)}
-                  </td>
-                  <td className="py-2 pr-4 text-right text-ink dark:text-inkDark">
-                    {row.kerosene.toFixed(2)}
-                  </td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
-      </section>
+      {/* Price events calendar */}
+      <PriceEventsCalendar data={data} events={events} />
     </div>
   );
 }

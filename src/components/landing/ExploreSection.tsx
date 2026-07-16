@@ -9,14 +9,16 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
+  ReferenceDot,
 } from "recharts";
-import { ArrowUp, ArrowDown, Fuel } from "lucide-react";
+import { ArrowUp, ArrowDown, Fuel, CalendarClock, Minus } from "lucide-react";
 import type {
   CurrentPrice,
   HistoryPoint,
   YearPoint,
   CommodityDetail,
   CommoditySlug,
+  HistoricalEvent,
 } from "@/lib/types";
 import { useTheme } from "@/components/ThemeProvider";
 import Reveal from "@/components/Reveal";
@@ -61,6 +63,7 @@ export default function ExploreSection({
   prices,
   history,
   sinceIndependence,
+  events,
   details,
   selected,
   onSelect,
@@ -68,6 +71,7 @@ export default function ExploreSection({
   prices: CurrentPrice[];
   history: HistoryPoint[];
   sinceIndependence: YearPoint[];
+  events: HistoricalEvent[];
   details: Record<CommoditySlug, CommodityDetail>;
   selected: CommoditySlug;
   onSelect: (slug: CommoditySlug) => void;
@@ -75,6 +79,9 @@ export default function ExploreSection({
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const [period, setPeriod] = useState<Period>("2Y");
+  const [scrubYear, setScrubYear] = useState<number>(
+    sinceIndependence[sinceIndependence.length - 1]?.year ?? 2026
+  );
 
   const current = prices.find((p) => p.slug === selected)!;
   const detail = details[selected];
@@ -97,6 +104,22 @@ export default function ExploreSection({
 
   const gridColor = isDark ? "#3A332A" : "#E8E4DC";
   const axisColor = isDark ? "#A39C92" : "#6B6560";
+
+  const minYear = sinceIndependence[0]?.year ?? 1963;
+  const maxYear = sinceIndependence[sinceIndependence.length - 1]?.year ?? 2026;
+
+  const priceForYear = useMemo(() => {
+    const map = new Map(sinceIndependence.map((p) => [p.year, p.price]));
+    return (year: number) => map.get(year);
+  }, [sinceIndependence]);
+
+  const activeEvent = useMemo(() => {
+    if (events.length === 0) return null;
+    return events.reduce((closest, e) =>
+      Math.abs(e.year - scrubYear) < Math.abs(closest.year - scrubYear) ? e : closest
+    );
+  }, [events, scrubYear]);
+  const isExactEventYear = activeEvent?.year === scrubYear;
 
   return (
     <Reveal as="section" id="explore" className="py-16 md:py-20 bg-surfaceLight dark:bg-surfaceLightDark scroll-mt-28">
@@ -151,17 +174,23 @@ export default function ExploreSection({
                 </div>
                 <div
                   className={`text-sm font-semibold inline-flex items-center gap-1 justify-end w-full ${
-                    current.percentChange >= 0
+                    current.percentChange === 0
+                      ? "text-muted dark:text-mutedDark"
+                      : current.percentChange > 0
                       ? "text-danger dark:text-dangerDark"
                       : "text-primary dark:text-primaryDark"
                   }`}
                 >
-                  {current.percentChange >= 0 ? (
+                  {current.percentChange === 0 ? (
+                    <Minus size={13} />
+                  ) : current.percentChange > 0 ? (
                     <ArrowUp size={13} />
                   ) : (
                     <ArrowDown size={13} />
                   )}
-                  {Math.abs(current.percentChange).toFixed(2)}%
+                  {current.percentChange === 0
+                    ? "Unchanged"
+                    : `${Math.abs(current.percentChange).toFixed(2)}%`}
                 </div>
               </div>
             </div>
@@ -223,9 +252,77 @@ export default function ExploreSection({
                     strokeWidth={2.5}
                     fill="url(#exploreFill)"
                   />
+                  {effectivePeriod === "ALL" &&
+                    events.map((e) => {
+                      const y = priceForYear(e.year);
+                      if (y === undefined) return null;
+                      return (
+                        <ReferenceDot
+                          key={e.year}
+                          x={String(e.year)}
+                          y={y}
+                          r={e.year === activeEvent?.year ? 6 : 4}
+                          fill={e.year === activeEvent?.year ? current.color : "#B8860B"}
+                          stroke={isDark ? "#211D17" : "#FFFFFF"}
+                          strokeWidth={2}
+                          isFront
+                        />
+                      );
+                    })}
                 </AreaChart>
               </ResponsiveContainer>
             </div>
+
+            {effectivePeriod === "ALL" && (
+              <div className="mt-5 pt-5 border-t border-border dark:border-borderDark">
+                <div className="flex items-center gap-2 mb-2 text-xs font-semibold text-muted dark:text-mutedDark uppercase tracking-wider">
+                  <CalendarClock size={13} />
+                  Scrub through the decades
+                </div>
+                <input
+                  type="range"
+                  min={minYear}
+                  max={maxYear}
+                  step={1}
+                  value={scrubYear}
+                  onChange={(e) => setScrubYear(Number(e.target.value))}
+                  className="year-slider w-full"
+                  style={{ color: current.color, accentColor: current.color }}
+                  aria-label="Select a year to see fuel price history and events"
+                />
+                <div className="flex items-center justify-between mt-2 mb-3">
+                  <span className="font-mono-data text-xs text-muted dark:text-mutedDark">
+                    {minYear}
+                  </span>
+                  <span className="font-display font-bold text-lg text-ink dark:text-inkDark">
+                    {scrubYear}
+                    {priceForYear(scrubYear) !== undefined && (
+                      <span className="font-mono-data font-normal text-sm text-muted dark:text-mutedDark ml-2">
+                        KES {priceForYear(scrubYear)?.toFixed(2)}
+                      </span>
+                    )}
+                  </span>
+                  <span className="font-mono-data text-xs text-muted dark:text-mutedDark">
+                    {maxYear}
+                  </span>
+                </div>
+                {activeEvent && (
+                  <div className="rounded-xl bg-surfaceLight dark:bg-surfaceLightDark border border-border dark:border-borderDark p-4">
+                    {!isExactEventYear && (
+                      <p className="text-[11px] text-muted dark:text-mutedDark mb-1.5">
+                        Nearest recorded event — {activeEvent.year}
+                      </p>
+                    )}
+                    <p className="font-semibold text-sm text-ink dark:text-inkDark mb-1">
+                      {activeEvent.title}
+                    </p>
+                    <p className="text-sm text-muted dark:text-mutedDark leading-relaxed">
+                      {activeEvent.description}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Why is this happening? */}

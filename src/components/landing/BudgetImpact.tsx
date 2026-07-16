@@ -52,9 +52,10 @@ export default function BudgetImpact({ data }: { data: BudgetShare[] }) {
             );
           })}
           <p className="text-[11px] text-muted dark:text-mutedDark mt-4 pt-4 border-t border-border dark:border-borderDark">
-            Kenya&apos;s figure is derived from Hali&apos;s tracked pump price.
-            Every other country is a clearly-labelled illustrative estimate
-            until Hali tracks it live.
+            Kenya, Tanzania, and Uganda figures are derived from
+            live-tracked pump prices (see each country&apos;s source on the
+            map above). Every other country is a clearly-labelled
+            illustrative estimate until Hali tracks it live.
           </p>
         </div>
       </div>

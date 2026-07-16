@@ -27,9 +27,16 @@ export default function Hero({
   const petrol = prices.find((p) => p.slug === "petrol")!;
 
   const stats = prices.map((p) => ({
-    label: `${p.commodity} is ${p.percentChange >= 0 ? "up" : "down"}`,
-    value: `${p.percentChange >= 0 ? "+" : ""}${p.percentChange.toFixed(1)}%`,
+    label:
+      p.percentChange === 0
+        ? `${p.commodity} is`
+        : `${p.commodity} is ${p.percentChange > 0 ? "up" : "down"}`,
+    value:
+      p.percentChange === 0
+        ? "Unchanged"
+        : `${p.percentChange > 0 ? "+" : ""}${p.percentChange.toFixed(1)}%`,
     sub: "this month",
+    flat: p.percentChange === 0,
     positive: p.percentChange < 0,
   }));
 
@@ -47,10 +54,11 @@ export default function Hero({
             ?
           </h1>
           <p className="text-lg text-muted dark:text-mutedDark leading-relaxed mb-8 max-w-xl">
-            Hali tracks Super Petrol, Diesel, and Kerosene prices in Kenya
-            today, expanding across East Africa next, and explains what&apos;s
-            behind every change — no economics degree required. Today&apos;s
-            Super Petrol price in Kenya:{" "}
+            Hali now tracks Super Petrol, Diesel, and Kerosene prices in
+            Kenya, Tanzania, and Uganda — with Kenya&apos;s full price
+            history live below — and explains what&apos;s behind every
+            change, no economics degree required. Today&apos;s Super Petrol
+            price in Kenya:{" "}
             <span className="font-mono-data font-semibold text-ink dark:text-inkDark">
               KES {petrol.currentPrice.toFixed(2)}
             </span>{" "}
@@ -61,8 +69,9 @@ export default function Hero({
           </p>
           <div className="flex flex-wrap gap-3 mb-2">
             {prices.map((p) => {
+              const isFlat = p.percentChange === 0;
               const isDown = p.percentChange < 0;
-              const arrow = isDown ? "↓" : "↑";
+              const arrow = isFlat ? "—" : isDown ? "↓" : "↑";
               return (
                 <button
                   key={p.slug}
@@ -76,13 +85,15 @@ export default function Hero({
                   {p.commodity}
                   <span
                     className={
-                      isDown
+                      isFlat
+                        ? "text-muted dark:text-mutedDark font-semibold text-xs"
+                        : isDown
                         ? "text-primary dark:text-primaryDark font-semibold text-xs"
                         : "text-danger dark:text-dangerDark font-semibold text-xs"
                     }
                   >
                     {arrow}
-                    {Math.abs(p.percentChange).toFixed(1)}%
+                    {!isFlat && `${Math.abs(p.percentChange).toFixed(1)}%`}
                   </span>
                 </button>
               );
@@ -113,7 +124,9 @@ export default function Hero({
               </div>
               <div
                 className={`font-mono-data font-bold text-xl mt-1 ${
-                  s.positive
+                  s.flat
+                    ? "text-muted dark:text-mutedDark"
+                    : s.positive
                     ? "text-primary dark:text-primaryDark"
                     : "text-danger dark:text-dangerDark"
                 }`}
