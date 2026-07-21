@@ -8,6 +8,7 @@ import {
   getPerspectives,
   getSinceIndependenceSeries,
   getHistoricalEvents,
+  getFactOfTheDay,
 } from "@/lib/data";
 import type { CommoditySlug, CommodityDetail } from "@/lib/types";
 import LandingClient from "@/components/landing/LandingClient";
@@ -21,6 +22,7 @@ export default function HomePage() {
   const perspectives = getPerspectives();
   const sinceIndependence = getSinceIndependenceSeries();
   const historicalEvents = getHistoricalEvents();
+  const fact = getFactOfTheDay();
 
   const slugs: CommoditySlug[] = ["petrol", "diesel", "kerosene"];
   const details = slugs.reduce((acc, slug) => {
@@ -34,6 +36,7 @@ export default function HomePage() {
       history={history}
       sinceIndependence={sinceIndependence}
       historicalEvents={historicalEvents}
+      fact={fact}
       details={details}
       stories={stories}
       countries={countries}

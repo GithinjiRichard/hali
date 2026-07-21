@@ -19,6 +19,8 @@ import type {
   YearPoint,
   HistoricalEvent,
   PriceEvent,
+  DailyFact,
+  QuoteRow,
 } from "./types";
 
 // ---------------------------------------------------------------------------
@@ -223,6 +225,47 @@ export function getPriceHistory(): HistoryPoint[] {
 }
 
 // ---------------------------------------------------------------------------
+// Quotes table — the same "multiple timeframes, color-coded by size of
+// move" format used by commodity quote grids (Trading Economics-style),
+// adapted honestly to how Kenyan pump prices actually work: EPRA sets them
+// once a month, they don't tick every second like a traded commodity. So
+// instead of live/weekly columns, this compares against real points already
+// in our 24-month series: last cycle, 3 months back, 6 months back, YTD,
+// and a year ago. Nothing here is invented — it's the same real data
+// getPriceHistory() exposes, just re-sliced for comparison.
+// ---------------------------------------------------------------------------
+function pctBetween(current: number, past: number | undefined): number | null {
+  if (past === undefined) return null;
+  return Math.round(((current - past) / past) * 1000) / 10;
+}
+
+export function getQuotesTable(): QuoteRow[] {
+  const prices = getCurrentPrices();
+  const lastIdx = MONTHS.length - 1;
+  const yearOfLast = Number(MONTHS[lastIdx].slice(0, 4));
+  const jan1ThisYear = `${yearOfLast}-01-01`;
+  const ytdIdx = MONTHS.indexOf(jan1ThisYear);
+
+  return prices.map((p) => {
+    const s = series[p.slug];
+    return {
+      commodity: p.commodity,
+      slug: p.slug,
+      unit: p.unit,
+      color: p.color,
+      current: p.currentPrice,
+      changeAbs: Math.round((p.currentPrice - p.previousPrice) * 100) / 100,
+      changePct: p.percentChange,
+      pct3M: pctBetween(p.currentPrice, s[lastIdx - 3]),
+      pct6M: pctBetween(p.currentPrice, s[lastIdx - 6]),
+      pctYTD: ytdIdx >= 0 ? pctBetween(p.currentPrice, s[ytdIdx]) : null,
+      pctYoY: pctBetween(p.currentPrice, s[lastIdx - 12]),
+      asOf: p.lastUpdated,
+    };
+  });
+}
+
+// ---------------------------------------------------------------------------
 // Price Events — real, dated events behind the moves in the recent 24-month
 // chart on /trends. Unlike getHistoricalEvents() (which covers 1963–today
 // for the landing page's independence-era view), these are specific to
@@ -402,6 +445,7 @@ export interface CountrySnapshot {
   status: "live" | "coming_soon";
   petrolPrice?: number;
   dieselPrice?: number;
+  kerosenePrice?: number;
   currency?: string;
   priceModel?: "regulated" | "deregulated";
   sourceLabel?: string;
@@ -439,6 +483,7 @@ const UGANDA_ANCHOR = {
 export function getEastAfricaSnapshot(): CountrySnapshot[] {
   const petrol = getCurrentPrices().find((p) => p.slug === "petrol");
   const diesel = getCurrentPrices().find((p) => p.slug === "diesel");
+  const kerosene = getCurrentPrices().find((p) => p.slug === "kerosene");
   return [
     {
       code: "KE",
@@ -447,6 +492,7 @@ export function getEastAfricaSnapshot(): CountrySnapshot[] {
       status: "live",
       petrolPrice: petrol?.currentPrice,
       dieselPrice: diesel?.currentPrice,
+      kerosenePrice: kerosene?.currentPrice,
       currency: "KES",
       priceModel: "regulated",
       sourceLabel: "EPRA monthly pump price circular",
@@ -459,6 +505,7 @@ export function getEastAfricaSnapshot(): CountrySnapshot[] {
       status: "live",
       petrolPrice: TANZANIA_ANCHOR.current.petrol,
       dieselPrice: TANZANIA_ANCHOR.current.diesel,
+      kerosenePrice: TANZANIA_ANCHOR.current.kerosene,
       currency: "TZS",
       priceModel: "regulated",
       sourceLabel: TANZANIA_ANCHOR.sourceLabel,
@@ -482,6 +529,10 @@ export function getEastAfricaSnapshot(): CountrySnapshot[] {
     { code: "CD", name: "DR Congo", flag: "🇨🇩", status: "coming_soon" },
     { code: "SO", name: "Somalia", flag: "🇸🇴", status: "coming_soon" },
   ];
+}
+
+export function getCountryByCode(code: string): CountrySnapshot | undefined {
+  return getEastAfricaSnapshot().find((c) => c.code.toLowerCase() === code.toLowerCase());
 }
 
 function pctChange(slug: CommoditySlug) {
@@ -848,4 +899,32 @@ export function getHistoricalEvents(): HistoricalEvent[] {
         "Sanctions and supply disruption sent global crude and gas prices sharply higher worldwide, a shock that rippled through to Kenyan pump prices along with nearly every importing economy on earth.",
     },
   ];
+}
+
+// ---------------------------------------------------------------------------
+// Fact of the Day — a zero-maintenance way to have the site feel current
+// every day without inventing anything. Rotates deterministically through
+// the two real event pools above (independence-era + recent EPRA cycles)
+// based on the calendar day, so it's stable within a day and changes the
+// next. This is a rotation through real, already-sourced facts — it does
+// not claim any event "happened today," just that today's fact is this one.
+// ---------------------------------------------------------------------------
+export function getFactOfTheDay(): DailyFact {
+  const pool: DailyFact[] = [
+    ...getHistoricalEvents().map((e) => ({
+      title: e.title,
+      description: e.description,
+      year: e.year,
+      kind: "independence" as const,
+    })),
+    ...getPriceEvents().map((e) => ({
+      title: e.title,
+      description: e.description,
+      period_date: e.period_date,
+      kind: "recent" as const,
+    })),
+  ];
+  const startOfYear = new Date(new Date().getFullYear(), 0, 0).getTime();
+  const dayOfYear = Math.floor((Date.now() - startOfYear) / 86400000);
+  return pool[dayOfYear % pool.length];
 }

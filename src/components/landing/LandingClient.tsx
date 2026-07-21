@@ -12,6 +12,7 @@ import type {
   PerspectiveItem,
   PerspectiveKey,
   HistoricalEvent,
+  DailyFact,
 } from "@/lib/types";
 import type { CountrySnapshot } from "@/lib/data";
 import Hero from "./Hero";
@@ -24,12 +25,14 @@ import NewsletterCTA from "./NewsletterCTA";
 import Toast from "@/components/Toast";
 import Reveal from "@/components/Reveal";
 import LandingSubNav from "./LandingSubNav";
+import FactOfTheDay from "./FactOfTheDay";
 
 export default function LandingClient({
   prices,
   history,
   sinceIndependence,
   historicalEvents,
+  fact,
   details,
   stories,
   countries,
@@ -40,6 +43,7 @@ export default function LandingClient({
   history: HistoryPoint[];
   sinceIndependence: YearPoint[];
   historicalEvents: HistoricalEvent[];
+  fact: DailyFact;
   details: Record<CommoditySlug, CommodityDetail>;
   stories: Story[];
   countries: CountrySnapshot[];
@@ -72,6 +76,8 @@ export default function LandingClient({
       />
 
       <LandingSubNav />
+
+      <FactOfTheDay fact={fact} />
 
       <StoriesGrid stories={stories} onSelectCommodity={selectAndScroll} />
 

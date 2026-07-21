@@ -1,11 +1,13 @@
-import { getPriceHistory, getPriceEvents } from "@/lib/data";
+import { getPriceHistory, getPriceEvents, getQuotesTable } from "@/lib/data";
 import TrendsClient from "./TrendsClient";
+import QuotesTable from "@/components/QuotesTable";
 
 export const dynamic = "force-dynamic";
 
 export default function TrendsPage() {
   const history = getPriceHistory();
   const events = getPriceEvents();
+  const quotes = getQuotesTable();
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
@@ -19,6 +21,8 @@ export default function TrendsPage() {
           across the last {history.length} months.
         </p>
       </div>
+
+      <QuotesTable rows={quotes} />
 
       <TrendsClient data={history} events={events} />
     </div>
