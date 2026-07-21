@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import type { CountrySnapshot } from "@/lib/data";
 
 // Approximate, stylized positions (not cartographically precise — same
@@ -47,16 +48,11 @@ export default function EastAfricaMap({
                 c.priceModel === "deregulated" ? " (indicative, dealer prices vary)" : " — live"
               }`
             : `${c.name}: coming soon`;
-        return (
-          <button
-            key={c.code}
-            className="absolute -translate-x-1/2 -translate-y-1/2 z-10 group"
-            style={{ top: pos.top, left: pos.left }}
-            onMouseEnter={() => setHovered(c.code)}
-            onMouseLeave={() => setHovered(null)}
-            onClick={() => onTap(label)}
-            aria-label={label}
-          >
+        const href =
+          c.status === "live" ? (c.code === "KE" ? "/dashboard" : `/countries/${c.code.toLowerCase()}`) : undefined;
+
+        const marker = (
+          <>
             <span className="relative flex h-3.5 w-3.5">
               <span
                 className="hotspot-ping absolute inline-flex h-full w-full rounded-full"
@@ -74,19 +70,54 @@ export default function EastAfricaMap({
             >
               {c.flag} {label}
             </span>
+          </>
+        );
+
+        if (href) {
+          return (
+            <Link
+              key={c.code}
+              href={href}
+              className="absolute -translate-x-1/2 -translate-y-1/2 z-10 group"
+              style={{ top: pos.top, left: pos.left }}
+              onMouseEnter={() => setHovered(c.code)}
+              onMouseLeave={() => setHovered(null)}
+              aria-label={`${label} — view details`}
+            >
+              {marker}
+            </Link>
+          );
+        }
+
+        return (
+          <button
+            key={c.code}
+            className="absolute -translate-x-1/2 -translate-y-1/2 z-10 group"
+            style={{ top: pos.top, left: pos.left }}
+            onMouseEnter={() => setHovered(c.code)}
+            onMouseLeave={() => setHovered(null)}
+            onClick={() => onTap(label)}
+            aria-label={label}
+          >
+            {marker}
           </button>
         );
       })}
 
-      <div className="absolute bottom-4 right-4 flex gap-4 text-[11px] text-muted dark:text-mutedDark font-medium">
-        <span className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-primary dark:bg-primaryDark" />
-          Live
+      <div className="absolute bottom-4 left-4 right-4 flex flex-wrap items-center justify-between gap-3">
+        <span className="text-[11px] text-muted dark:text-mutedDark">
+          Tap a live marker to open that country
         </span>
-        <span className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-accent dark:bg-accentDark" />
-          Coming soon
-        </span>
+        <div className="flex gap-4 text-[11px] text-muted dark:text-mutedDark font-medium">
+          <span className="flex items-center gap-1.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-primary dark:bg-primaryDark" />
+            Live
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-accent dark:bg-accentDark" />
+            Coming soon
+          </span>
+        </div>
       </div>
     </div>
   );

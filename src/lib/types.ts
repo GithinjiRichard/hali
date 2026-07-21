@@ -106,6 +106,29 @@ export interface PerspectiveItem {
 
 export type PerspectiveKey = "citizen" | "business" | "government";
 
+export interface QuoteRow {
+  commodity: string;
+  slug: CommoditySlug;
+  unit: string;
+  color: string;
+  current: number;
+  changeAbs: number;
+  changePct: number;
+  pct3M: number | null;
+  pct6M: number | null;
+  pctYTD: number | null;
+  pctYoY: number | null;
+  asOf: string;
+}
+
+export interface DailyFact {
+  title: string;
+  description: string;
+  year?: number;
+  period_date?: string;
+  kind: "independence" | "recent";
+}
+
 export interface PriceEvent {
   period_date: string;
   title: string;
