@@ -438,6 +438,29 @@ export function getNewsEvents(): NewsEvent[] {
 // headed next. No invented prices are shown for markets we don't track yet.
 // ---------------------------------------------------------------------------
 
+export type CountryTier = 1 | 2 | 3;
+export type Confidence = "official" | "reported" | "modeled";
+
+export interface CountryProfile {
+  code: string;
+  name: string;
+  flag: string;
+  region: string;
+  currency: string;
+  tier: CountryTier;
+  neighbors: string[];
+  priceModel?: "regulated" | "deregulated";
+  petrolPrice?: number;
+  dieselPrice?: number;
+  kerosenePrice?: number;
+  rangeLow?: number;
+  rangeHigh?: number;
+  confidence: Confidence;
+  sourceLabel: string;
+  effectiveLabel: string;
+  methodologyNote?: string;
+}
+
 export interface CountrySnapshot {
   code: string;
   name: string;
@@ -533,6 +556,153 @@ export function getEastAfricaSnapshot(): CountrySnapshot[] {
 
 export function getCountryByCode(code: string): CountrySnapshot | undefined {
   return getEastAfricaSnapshot().find((c) => c.code.toLowerCase() === code.toLowerCase());
+}
+
+// ---------------------------------------------------------------------------
+// Global country profiles — the "one adaptive page, three tiers" model.
+// Tier 1: an official body sets one national (or reference-city) price.
+// Tier 2: no single official price, but a real, dated, citable figure
+//   exists (often with a wide real range) — shown with a confidence flag,
+//   not false precision.
+// Tier 3: no usable direct source at all — shown as a modeled regional
+//   estimate with visible methodology, never a bare price card.
+// This reuses the same KE/TZ/UG anchors already powering the EAC map, so
+// the numbers stay consistent everywhere they appear.
+// ---------------------------------------------------------------------------
+
+// Real, researched (not World Bank — that indicator is stale, last real
+// values from ~2016). Ghana and Nigeria both deregulated years ago: there
+// is no single official cap, and real station-to-station prices vary
+// meaningfully, so both are Tier 2 with an honest range, not Tier 1.
+const GHANA_PROFILE = {
+  petrol: 1.31, // USD/litre, national reference
+  sourceLabel: "GOIL Company Limited benchmark, via Trading Economics",
+  effectiveLabel: "March 2026 — Ghana deregulated pump pricing in 2015; no single official cap",
+};
+
+const NIGERIA_PROFILE = {
+  petrol: 1077.5, // NGN/litre, national average
+  rangeLow: 1100,
+  rangeHigh: 1400, // NGN, real station-to-station range reported the same week
+  sourceLabel: "GlobalPetrolPrices.com national average, cross-checked against NNPC retail pricing",
+  effectiveLabel: "Early-to-mid July 2026 — fully deregulated since May 2023; prices vary by state and station",
+};
+
+// South Sudan: no regulator at all. Real, wildly volatile, city-specific
+// figures exist (cited below) but there is no single "current price" to
+// assert — a Tier 3 modeled estimate is the only honest treatment.
+const SOUTH_SUDAN_PROFILE = {
+  reportedJuba: 18500, // SSP/litre, licensed stations, mid-July 2026
+  reportedBlackMarket: 23000, // SSP/litre, same week
+  sourceLabel: "Reported pump prices, Juba, via One Citizen Daily (16 Jul 2026)",
+  methodologyNote:
+    "South Sudan has no fuel price regulator. Juba's licensed stations were reporting ~18,500 SSP/litre and the black market ~23,000 SSP/litre in mid-July 2026 — both real, dated figures, not a modeled number. Because there's no single official price and it moves by the week with the currency, we show the region's typical spread rather than inventing false precision.",
+};
+
+export function getCountryProfiles(): CountryProfile[] {
+  const eac = getEastAfricaSnapshot();
+  const ke = eac.find((c) => c.code === "KE")!;
+  const tz = eac.find((c) => c.code === "TZ")!;
+  const ug = eac.find((c) => c.code === "UG")!;
+
+  return [
+    {
+      code: "KE",
+      name: "Kenya",
+      flag: "🇰🇪",
+      region: "East Africa",
+      currency: "KES",
+      tier: 1,
+      neighbors: ["TZ", "UG", "SS"],
+      priceModel: "regulated",
+      petrolPrice: ke.petrolPrice,
+      dieselPrice: ke.dieselPrice,
+      kerosenePrice: ke.kerosenePrice,
+      confidence: "official",
+      sourceLabel: ke.sourceLabel!,
+      effectiveLabel: ke.effectiveLabel!,
+    },
+    {
+      code: "TZ",
+      name: "Tanzania",
+      flag: "🇹🇿",
+      region: "East Africa",
+      currency: "TZS",
+      tier: 1,
+      neighbors: ["KE", "UG", "RW"],
+      priceModel: "regulated",
+      petrolPrice: tz.petrolPrice,
+      dieselPrice: tz.dieselPrice,
+      kerosenePrice: tz.kerosenePrice,
+      confidence: "official",
+      sourceLabel: tz.sourceLabel!,
+      effectiveLabel: tz.effectiveLabel!,
+    },
+    {
+      code: "UG",
+      name: "Uganda",
+      flag: "🇺🇬",
+      region: "East Africa",
+      currency: "UGX",
+      tier: 1,
+      neighbors: ["KE", "TZ", "RW"],
+      priceModel: "deregulated",
+      petrolPrice: ug.petrolPrice,
+      dieselPrice: ug.dieselPrice,
+      confidence: "reported",
+      sourceLabel: ug.sourceLabel!,
+      effectiveLabel: ug.effectiveLabel!,
+    },
+    {
+      code: "GH",
+      name: "Ghana",
+      flag: "🇬🇭",
+      region: "West Africa",
+      currency: "USD",
+      tier: 2,
+      neighbors: ["NG"],
+      priceModel: "deregulated",
+      petrolPrice: GHANA_PROFILE.petrol,
+      confidence: "reported",
+      sourceLabel: GHANA_PROFILE.sourceLabel,
+      effectiveLabel: GHANA_PROFILE.effectiveLabel,
+    },
+    {
+      code: "NG",
+      name: "Nigeria",
+      flag: "🇳🇬",
+      region: "West Africa",
+      currency: "NGN",
+      tier: 2,
+      neighbors: ["GH"],
+      priceModel: "deregulated",
+      petrolPrice: NIGERIA_PROFILE.petrol,
+      rangeLow: NIGERIA_PROFILE.rangeLow,
+      rangeHigh: NIGERIA_PROFILE.rangeHigh,
+      confidence: "reported",
+      sourceLabel: NIGERIA_PROFILE.sourceLabel,
+      effectiveLabel: NIGERIA_PROFILE.effectiveLabel,
+    },
+    {
+      code: "SS",
+      name: "South Sudan",
+      flag: "🇸🇸",
+      region: "East Africa",
+      currency: "SSP",
+      tier: 3,
+      neighbors: ["KE", "UG"],
+      rangeLow: SOUTH_SUDAN_PROFILE.reportedJuba,
+      rangeHigh: SOUTH_SUDAN_PROFILE.reportedBlackMarket,
+      confidence: "modeled",
+      sourceLabel: SOUTH_SUDAN_PROFILE.sourceLabel,
+      effectiveLabel: "Mid-July 2026 — no national regulator; prices vary by city and change weekly",
+      methodologyNote: SOUTH_SUDAN_PROFILE.methodologyNote,
+    },
+  ];
+}
+
+export function getCountryProfile(code: string): CountryProfile | undefined {
+  return getCountryProfiles().find((c) => c.code.toLowerCase() === code.toLowerCase());
 }
 
 function pctChange(slug: CommoditySlug) {

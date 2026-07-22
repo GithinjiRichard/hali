@@ -59,9 +59,17 @@ Current version: **0.0.3**
 
 ### Countries
 - [x] Design and ship a per-country page (`/countries/[code]`) so Tanzania/Uganda visitors have somewhere to land — live markers on the map now link through (Kenya → full dashboard, Tanzania/Uganda → a snapshot page with price, source, methodology, and regional context).
-- [ ] Rwanda as the next live country (RURA — regulated model, similar to Kenya/Tanzania).
-- [ ] Full historical-chart depth for Tanzania and Uganda's own pages (currently: current price + source only, no 24-month series yet).
+- [x] **Adaptive tier system replacing the "one page per country forever" model** — `/countries/[code]` now branches on data richness (Tier 1: official price, Tier 2: reported figure + real range, Tier 3: modeled estimate + visible methodology) instead of assuming every country can support the same template. Proof of concept: Kenya + Tanzania (Tier 1), Uganda (Tier 1/reported hybrid), Ghana + Nigeria (Tier 2 — both turned out to be deregulated with real price ranges, not clean Tier 1 like assumed), South Sudan (Tier 3 — no regulator, real Juba/black-market range cited instead of a fabricated single price).
+- [ ] Rwanda as a genuine Tier 1 candidate (RURA — regulated, similar to Kenya/Tanzania) — not yet verified.
+- [ ] Wire the adaptive system to more countries — currently 6 profiles exist (`getCountryProfiles()`); scaling this further needs either more manual research passes or the structured-ingestion/crowdsourcing approach discussed for global scale (see "Sustainability at scale" notes below).
+- [ ] The EAC map widget is still East-Africa-only by design — Ghana/Nigeria/South Sudan pages exist and are reachable by direct URL but aren't yet surfaced from any on-site map/browse UI. A lightweight "browse other tracked countries" list is the natural next step for discoverability.
+- [ ] Full historical-chart depth for Tier 1/2 countries beyond Kenya (currently: current price + source only, no 24-month series for TZ/UG/GH/NG).
 - [ ] Multi-currency support across dashboard components (currently KES-hardcoded in several places outside the map/budget/country-page sections).
+
+### Sustainability at scale (from the "is this global-ready" discussion)
+- [ ] The current model (hand-researched, per-country) does not scale past a handful of Tier 1/2 countries — documented as a known, deliberate limit, not an oversight.
+- [ ] World Bank pump-price indicator (`EP.PMP.SGAS.CD`) investigated as a bulk Tier 2/3 data source — turned out to be stale (last real values ~2016), not usable as-is. Logged so nobody re-investigates it from scratch.
+- [ ] Real path to "global": either (a) a maintained third-party data feed/API (breaks the no-paid-services constraint — a real milestone to name explicitly when it happens), or (b) a crowdsourcing submission + light moderation flow, which is likely the *only* honest option for true data-desert markets (South Sudan, Somalia, CAR, etc.) since no regulator exists to source from.
 
 ### Automation & infra
 - [ ] Automate the EPRA price update (scheduled scraper/GitHub Action hitting the official page directly) — cadence table and runbook already documented in README, not yet built (no network access in the dev sandbox to build/test one).
