@@ -14,6 +14,7 @@ const NAV_LINKS = [
   { href: "/trends", label: "Trends" },
   { href: "/insights", label: "Insights" },
   { href: "/news", label: "News" },
+  { href: "/countries", label: "Countries" },
 ];
 
 export default function Navbar() {

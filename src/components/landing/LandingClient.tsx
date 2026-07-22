@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import type {
   CurrentPrice,
   HistoryPoint,
@@ -103,6 +105,15 @@ export default function LandingClient({
           </p>
         </div>
         <EastAfricaMap countries={countries} onTap={showToast} />
+        <div className="mt-4 text-center">
+          <Link
+            href="/countries"
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-accent dark:text-accentDark hover:gap-2.5 transition-all"
+          >
+            See every tracked country, including beyond East Africa
+            <ArrowRight size={14} />
+          </Link>
+        </div>
       </Reveal>
 
       <BudgetImpact data={budgetShare} />
